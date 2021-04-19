@@ -18,3 +18,8 @@ sklearn.pipeline
     selection and prediction for the desired forecast type.
 
 """
+from sklearn.multioutput import
+from skits.feature_extraction import AutoregressiveTransformer
+from skits.pipeline import ForecasterPipeline
+from skits.preprocessing import ReversibleImputer
+
