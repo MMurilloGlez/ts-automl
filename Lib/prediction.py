@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 import statsmodels.api as sm
 from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.preprocessing import MinMaxScaler
 
 from keras.preprocessing.sequence import TimeseriesGenerator
 from keras.models import Sequential
@@ -65,10 +66,6 @@ class glm_forecaster(BaseEstimator, RegressorMixin):
         if self.fit_intercept:
             X = sm.add_constant(X)
         return self.results_.predict(X)
-
-
-def scaler():
-    pass
 
 
 def LSTM_Model_gen():
@@ -143,6 +140,7 @@ Mixed_Model = KerasRegressor(build_fn=Mixed_Model_gen, verbose=1, epochs=10)
 KNN_Model = KNeighborsRegressor(n_neighbors=20, n_jobs=-1)
 LGB_Model = LGBMRegressor()
 GLM_Model = TweedieRegressor(power=3,, fit_intercept=True, verbose=1)
+scaler = MinMaxScaler(feature_range=(0,1))
 
 #-------------------------------------------------------------------------------
 
@@ -159,11 +157,15 @@ def recursive_forecast(y, model, window_length, feature_names, rolling_window,
 
     Parameters
     ----------
-    y: pd.Series holding the input time-series to forecast
+    y: pd.Series 
+        holding the input time-series to forecast
     model: pre-trained machine learning model
-    lags: list of lags used for training the model
-    n_steps: number of time periods in the forecasting horizon
-    step: forecasting time period
+    lags: list of str
+        list of lags used for training the model
+    n_steps: int 
+        number of time periods in the forecasting horizon
+    step: int 
+        forecasting time period
    
     Returns
     -------
@@ -182,6 +184,51 @@ def recursive_forecast(y, model, window_length, feature_names, rolling_window,
     for i in range(n_steps):                                  
         train = create_features(feature_names, lags, target_range[i]) 
         new_value = model.predict(pd.DataFrame(train).transpose()) 
+        target_value[i] = new_value[0]                             
+        lags.pop(0)                                                
+        lags.append(new_value[0])                                   
+                                                        
+
+    return target_value
+
+def recursive_forecast_np(y, model, window_length, feature_names, 
+                          rolling_window, n_steps, scaler):
+    """
+    Recursive forecast function using numpy arrays
+
+    Since keras LSTM and TCN models require numpy arrays that have specific 
+    shapes to function, implement recursive forecasting on numpy arrays, 
+    updating each data point with the previous one to predict the next.
+
+    Parameters
+    ----------
+    y: pd.Series
+        Input time series with constant frequency
+    model: pre-trained model
+        Keras RNN model
+    scaler: Scaler
+        Scaler to apply to Keras model input
+    
+    Returns
+    -------
+    pd.Series
+        Forecasted values
+    """
+   
+    # get the dates to forecast
+    last_date = y.index[-1] + datetime.timedelta(minutes=15)
+    target_range = pd.date_range(last_date, periods=n_steps, freq=freq) 
+    target_value = np.arange(n_steps, dtype = float)       
+    max_rol = max(rolling_window, default=1)     
+    lags = list(y.iloc[-(window_length+(max_rol-1)):,0].values)
+    ####
+    
+    
+    for i in range(n_steps):                                  
+        train = create_features(feature_names, lags, target_range[i]) 
+        train_np = np.array(train, dtype=float)
+        train_np_s = scaler.fit_transform(train_np.reshape(-1,1))
+        new_value = model.predict(train_np_s.reshape(-1,1,len(feature_names)))
         target_value[i] = new_value[0]                             
         lags.pop(0)                                                
         lags.append(new_value[0])                                   

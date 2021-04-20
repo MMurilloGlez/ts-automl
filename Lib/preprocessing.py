@@ -37,7 +37,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.base import TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
 import scipy
-import pywt
 
 def ts_split(data, val_size=0.1):
     """split training data into train and val"""
@@ -752,50 +751,3 @@ def switch_optimization(value, regressor):
         'tpe': lambda : tpe_optimization(),
         'pso': lambda : pso_optimization(),
     }.get(value)()
-
-
-#-------------------------------------------------------------------------------
-
-def recursive_forecast(y, model, window_length, feature_names, 
-                       rolling_window, n_steps):
-    """Recursive forecasting workflow for a pre-trained model"""
-
-    """
-    Recursive forecasting workflow. Works by dinamically modifying the lags in
-    the dataset, replacing the most recently predicted value for a feature set
-    instead of the most recent lag, so at the next iteration values are computed
-    with the previous iteration's data
-
-    Parameters
-    ----------
-    y: pd.Series 
-        holding the input time-series to forecast
-    model: pre-trained machine learning model
-    lags: list of int
-        list of lags used for training the model
-    n_steps: int
-        number of time periods in the forecasting horizon
-    step: int
-        forecasting time period
-   
-    Returns
-    -------
-    fcast_values: pd.Series with forecasted values
-    """
-   
-    last_date = y.index[-1] + datetime.timedelta(minutes=15) 
-    target_range = pd.date_range(last_date, periods=n_steps, freq=freq)
-    target_value = np.arange(n_steps, dtype = float)
-    max_rol = max(rolling_window, default=1)
-    lags = list(y.iloc[-(window_length+(max_rol-1)):,0].values)
-    ####
-    
-    
-    for i in range(n_steps):
-        train = create_features(feature_names, lags, target_range[i]) 
-        new_value = model.predict(pd.DataFrame(train).transpose())
-        target_value[i] = new_value[0]
-        lags.pop(0) 
-        lags.append(new_value[0]) 
-
-    return target_value
