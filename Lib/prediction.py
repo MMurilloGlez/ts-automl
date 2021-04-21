@@ -192,7 +192,7 @@ def recursive_forecast(y, model, window_length, feature_names, rolling_window,
     return target_value
 
 def recursive_forecast_np(y, model, window_length, feature_names, 
-                          rolling_window, n_steps, scaler):
+                          rolling_window, n_steps):
     """
     Recursive forecast function using numpy arrays
 
@@ -226,12 +226,13 @@ def recursive_forecast_np(y, model, window_length, feature_names,
     
     for i in range(n_steps):                                  
         train = create_features(feature_names, lags, target_range[i]) 
-        train_np = np.array(train, dtype=float)
+        train_np = np.array(train, dtype=object)
         train_np_s = scaler.fit_transform(train_np.reshape(-1,1))
         new_value = model.predict(train_np_s.reshape(-1,1,len(feature_names)))
-        target_value[i] = new_value[0]                             
+        new_valu_0 = new_value[0][0][0]
+        target_value[i] = new_valu_0
         lags.pop(0)                                                
-        lags.append(new_value[0])                                   
+        lags.append(new_valu_0)                                   
                                                         
 
     return target_value
