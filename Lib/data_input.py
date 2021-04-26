@@ -103,4 +103,3 @@ def parsedates(file_, date_format, freq, datecol):
     file_int = file_int.interpolate(method='time').reindex(desired_index)
 
     return(file_int)
-

@@ -1,6 +1,5 @@
-"""A module containing all preprocessing steps for time series analysis"""
+"""A module containing all preprocessing steps for time series analysis
 
-"""
 
 Module containing all necessary steps to convert an univariate input time series
 with a constant frequency into a multivariate dataframe with lags and features,
@@ -36,9 +35,11 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.base import TransformerMixin
 from sklearn.preprocessing import OneHotEncoder
+from skits.preprocessing import HorizonTransformer
+import lightgbm as lgb
 import scipy
 
-def ts_split(data, val_size=0.1):
+def ts_split(data, test_size=100):
     """split training data into train and val"""
 
     """
@@ -63,404 +64,9 @@ def ts_split(data, val_size=0.1):
     
     """
 
-    ts_train, ts_val = train_test_split(data, test_size=val_size, shuffle=False)
+    ts_train, ts_test = train_test_split(data, test_size=test_size, 
+                                         shuffle=False)
     return(ts_train, ts_test)
-
-# Extract Features -------------------------------------------------------------
-
-def lag_feature(data, num):
-    """Compute lag corresponding to num argument."""
-
-    """
-    Computes the lag component corresponding to a number of periods in the
-    past.
-    
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-        
-    Returns
-    -------
-    float
-        Corresponds to lag component to be calculated.
-    """
-    return data[-num]
-
-
-def minute_feature(date, num):
-    """One Hot encoding for minute of hour feature"""
-
-    """
-    One Hot encoding for the minute feature of a given sample. takes a 1 as the
-    value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.  
-
-    Returns
-    -------
-    int
-        1 or 0 
-    """
-    minute = date.minute
-    if minute == num:
-        return 1
-    else:
-        return 0
-
-
-def hour_feature(date, num):
-    """One Hot encoding for hour of day feature"""
-
-    """
-    One Hot encoding for the hour feature of a given sample. takes a 1 as the
-    value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.  
-
-    Returns
-    -------
-    int
-        1 or 0 
-    """
-    if hour == num:
-        return 1
-    else:
-        return 0
-
-
-def dayofweek_feature(date, num):
-    """One Hot encoding for day of week feature"""
-
-    """
-    One Hot encoding for the day of week feature of a given sample. takes a 1 as
-    the value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.  
-
-    Returns
-    -------
-    int
-        1 or 0 
-    """    
-    dayofweek = date.dayofweek
-    if dayofweek == num:
-        return 1
-    else:
-        return 0
-
-
-def day_feature(date, num):
-    """One Hot encoding for day of month feature"""
-
-    """
-    One Hot encoding for the day of month feature of a given sample. takes a 1
-    as the value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.  
-
-    Returns
-    -------
-    int
-        1 or 0 
-    """ 
-    day = date.day
-    if day == num:
-        return 1
-    else:
-        return 0
-    
-
-def month_feature(date, num):
-    """One Hot encoding for month of year feature"""
-
-    """
-    One Hot encoding for the month of year feature of a given sample. takes a 1
-    as the value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.  
-
-    Returns
-    -------
-    int
-        1 or 0 
-    """ 
-    month = date.month
-    if month == num:
-        return 1
-    else:
-        return 0
-
-    
-def quarter_feature(date, num):
-    """One Hot encoding for fiscal quarter feature"""
-
-    """
-    One Hot encoding for the fiscal quarter feature of a given sample. takes a 1
-    as the value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.  
-
-    Returns
-    -------
-    int
-        1 or 0 
-    """ 
-    quarter = date.quarter
-    if quarter == num:
-        return 1
-    else:
-        return 0
-    
-
-def weekofyear_feature(date, num):
-    """One Hot encoding for week of year feature"""
-
-    """
-    One Hot encoding for the week of year feature of a given sample. takes a 1
-    as the value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.  
-
-    Returns
-    -------
-    int
-        1 or 0 
-    """ 
-    weekofyear = date.weekofyear
-    if weekofyear == num:
-        return 1
-    else:
-        return 0
-
-    
-def weekend_feature(date, num):
-    """One Hot encoding for weekend feature"""
-
-    """
-    One Hot encoding for the weekend feature of a given sample. takes a 1
-    as the value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.  
-
-    Returns
-    -------
-    int
-        1 or 0 
-    """ 
-    dayofweek = date.dayofweek
-    if dayofweek == 5 or dayofweek == 6:
-        return 1
-    else:
-        return 0
-
-
-def mean_feature(data, rolling_window, num):
-    """Computes the mean for a given lag and its rolling window"""
-
-    """
-    Given a set number of lags in the past, a set rolling window and the input 
-    dataset, computes the rolling average mean for the given window.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-    rolling_window: list of int
-        rolling window over which to calculate the feature.
-    
-    Returns
-    -------
-    float
-        calculated feature
-    """
-    if num == 1:
-        return np.mean(data[-rolling_window:])
-    else:
-        return np.mean(data[-(rolling_window-1+num):-(num-1)])
-
-    
-def std_feature(data, rolling_window, num):
-    """Computes the standard deviation for a given lag and its rolling window"""
-
-    """
-    Given a set number of lags in the past, a set rolling window and the input 
-    dataset, computes the rolling standard deviation for the given window.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-    rolling_window: list of int
-        rolling window over which to calculate the feature.
-    
-    Returns
-    -------
-    float
-        calculated feature
-    """
-    if num == 1:
-        return np.std(data[-rolling_window:], ddof=1)
-    else:
-        return np.std(data[-(rolling_window-1+num):-(num-1)], ddof=1)
-
-
-def max_feature(data, rolling_window, num):
-    """Computes the maximum value for a given lag and its rolling window"""
-
-    """
-    Given a set number of lags in the past, a set rolling window and the input 
-    dataset, computes the rolling maximum value for the given window.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-    rolling_window: list of int
-        rolling window over which to calculate the feature.
-    
-    Returns
-    -------
-    float
-        calculated feature
-    """
-    if num == 1:
-        return np.max(data[-rolling_window:])
-    else:
-        return np.max(data[-(rolling_window-1+num):-(num-1)])
-
-
-def min_feature(data, rolling_window, num):
-    """Computes the minimum value for a given lag and its rolling window"""
-
-    """
-    Given a set number of lags in the past, a set rolling window and the input 
-    dataset, computes the rolling minimum value for the given window.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-    rolling_window: list of int
-        rolling window over which to calculate the feature.
-    
-    Returns
-    -------
-    float
-        calculated feature
-    """
-    if num == 1:
-        return np.min(data[-rolling_window:])
-    else:
-        return np.min(data[-(rolling_window-1+num):-(num-1)])
-
-
-def quantile_feature(data, rolling_window, num):
-    """Computes the median value for a given lag and its rolling window"""
-
-    """
-    Given a set number of lags in the past, a set rolling window and the input 
-    dataset, computes the rolling median value for the given window.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-    rolling_window: list of int
-        rolling window over which to calculate the feature.
-    
-    Returns
-    -------
-    float
-        calculated feature
-    """   
-    if num == 1:
-        return np.quantile(data[-rolling_window:], 0.5)
-    else:
-        return np.quantile(data[-(rolling_window-1+num):-(num-1)], 0.5)
-
-
-def iqr_feature(data, rolling_window, num):
-    """Computes the interquartile range for a given lag and its rolling 
-    window"""
-
-    """
-    Given a set number of lags in the past, a set rolling window and the input 
-    dataset, computes the rolling interquartile range value for the given 
-    window.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-    rolling_window: list of int
-        rolling window over which to calculate the feature.
-    
-    Returns
-    -------
-    float
-        calculated feature
-    """ 
-    if num == 1:
-        return scipy.stats.iqr(data[-rolling_window:], rng = [25, 75])
-    else:
-        return scipy.stats.iqr(data[-(rolling_window-1+num):-(num-1)], 
-                               rng = [25, 75])
-    
 
 #-------------------------------------------------------------------------------
 
@@ -657,6 +263,21 @@ def iqr_sample(series, rolling_window = 2):
 
 #-------------------------------------------------------------------------------
 
+def create_sample_features(X, window_length = 5, features = [], 
+                           rolling_window = [2]):
+    lags_X = lags_sample(X, window_length=window_length, step=1)
+    df = lags_X.copy()
+    for f in features:
+        if rolling_window:
+            for rol in rolling_window:
+                aux = switch_sample_features(f, X, lags_X, rol)
+                df = pd.concat([df, aux], axis = 1).dropna()
+        else:
+            aux = switch_sample_features(f, X, lags_X, [])
+            df = pd.concat([df, aux], axis = 1).dropna()
+    return df
+
+
 def switch_sample_features(value, X, lags_X, rolling_window):
     """Switch for selecting sample features to add to the initial time series"""
 
@@ -699,55 +320,32 @@ def switch_sample_features(value, X, lags_X, rolling_window):
     }.get(value)()
 
 
-def switch_features(value, lags_data, date, rolling_window, num):
-    """Switch for selecting features to add to the initial time series"""
-
-    """
-    A switch, that takes as input the 
-    
-    Parameters
-    ----------
-    value: list of str
-
-    X: pd.Dataframe
-
-    lags_data: list of int
-
-    date: datetime
-        
-    rolling_window: list of int
-
-    num: int
-
-
-    Returns
-    -------
-    function call
-        Function call to corresponding feature creation 
-    """
-    return {
-        'lag': lambda : lag_feature(lags_data, num),
-        #--------------------------------------------------------------
-        'mean': lambda : mean_feature(lags_data, rolling_window, num),
-        'std': lambda : std_feature(lags_data, rolling_window, num),
-        'max': lambda : max_feature(lags_data, rolling_window, num),
-        'min': lambda : min_feature(lags_data, rolling_window, num),
-        'quantile': lambda : quantile_feature(lags_data, rolling_window, num),
-        'iqr': lambda : iqr_feature(lags_data, rolling_window, num),
-        #--------------------------------------------------------------
-        'minute': lambda : minute_feature(date, num),
-        'hour': lambda : hour_feature(date, num),
-        'dayofweek': lambda : dayofweek_feature(date, num),
-        'day': lambda : day_feature(date, num),
-        'month': lambda : month_feature(date, num),
-        'quarter': lambda : quarter_feature(date, num),
-        'weekofyear': lambda : weekofyear_feature(date, num),
-        'weekend': lambda : weekend_feature(date, num)
-    }.get(value)()
-
-
 def switch_optimization(value, regressor):
     return {
         'tpe': lambda : tpe_optimization(),
         'pso': lambda : pso_optimization(),
     }.get(value)()
+
+
+#-------------------------------------------------------------------------------
+
+def create_horizon(df, horizon):
+    y = df.copy()
+    ht = HorizonTransformer(horizon = horizon+1)
+    y_horizon = ht.fit_transform(y.iloc[:,0]) 
+    y_horizon = pd.DataFrame(y_horizon[:-horizon, :], index = y.index[horizon:])
+    name = 't+'+str(horizon)
+    y_horizon = pd.DataFrame({name : y_horizon.iloc[:, -1]})
+    
+    return y_horizon
+
+def feature_selection(X, y, num_features):
+    clf = lgb.LGBMRegressor(n_estimators=40).fit(X, y)
+    best_indx_col = clf.feature_importances_.argsort()[-num_features:]
+    best_features = list(X.columns[best_indx_col])
+    return order_by_other_list(X.columns, best_features)
+
+def order_by_other_list(list_order, list_tobe_order):
+    d = {k:v for v,k in enumerate(list_order)}
+    list_tobe_order.sort(key=d.get)
+    return list_tobe_order
