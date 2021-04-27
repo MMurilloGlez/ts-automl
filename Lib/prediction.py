@@ -93,11 +93,11 @@ def LSTM_Model_gen(n_feat):
     model1.add(LSTM(256, activation='relu', return_sequences=True))
     model1.add(Dense(1))
     
-    model1.compile(loss='mse', optimizer='adam', 
+    model1.compile(loss='mape', optimizer='adam',
                   metrics = MeanAbsolutePercentageError())
     return(model1)
 
-def Mixed_Model_gen(n_eat):
+def Mixed_Model_gen(n_feat):
     """
     Mixed recurrent neural net model construcion for forecasting with keras
 
@@ -108,7 +108,7 @@ def Mixed_Model_gen(n_eat):
 
     """
     model2 = Sequential()
-    model2.add(TCN(input_shape=(1,n_feat),  return_sequences=True, 
+    model2.add(TCN(input_shape=(1,n_feat),  return_sequences=True,  
                    use_batch_norm=True, activation = 'relu', padding = 'causal', 
                    dropout_rate = 0.3))
     model2.add(LSTM(256, activation='relu', return_sequences=True))
@@ -131,9 +131,9 @@ def TCN_Model_gen(n_feat):
     model3 = Sequential()
     model3.add(TCN(input_shape=(1,n_feat),  return_sequences=True, 
                    use_batch_norm=True, activation = 'relu', padding = 'causal',
-                   dropout_rate = 0.3))
+                   dropout_rate = 0.5))
     model3.add(TCN(return_sequences=True, use_batch_norm=True, 
-                   activation = 'relu', padding = 'causal', dropout_rate = 0.3))
+                   activation = 'relu', padding = 'causal', dropout_rate = 0.5))
     model3.add(Dense(1, activation = 'relu'))
 
     model3.compile(loss='mape', optimizer='adam', 
@@ -142,15 +142,15 @@ def TCN_Model_gen(n_feat):
 
 def LSTM_Model(n_feat):
     return KerasRegressor(build_fn=(lambda: LSTM_Model_gen(n_feat)), 
-                          verbose=1, 
+                          verbose=1,  batch_size=16,
                           epochs=50)
 def TCN_Model(n_feat):
     return KerasRegressor(build_fn=(lambda: TCN_Model_gen(n_feat)), 
-                          verbose=1, 
-                          epochs=50)
+                          verbose=1,  batch_size=16, 
+                          epochs=100)
 def Mixed_Model(n_feat):
-    return KerasRegressor(build_fn=Mixed_Model_gen(n_feat), 
-                          verbose=1, 
+    return KerasRegressor(build_fn=(lambda: Mixed_Model_gen(n_feat)), 
+                          verbose=1,  batch_size=16,
                           epochs=10)
 KNN_Model = KNeighborsRegressor(n_neighbors=20, n_jobs=-1)
 LGB_Model = LGBMRegressor()
@@ -702,7 +702,7 @@ def recursive_forecast_np(y, model, window_length, feature_names,
     # get the dates to forecast
     last_date = y.index[-1] + datetime.timedelta(minutes=15)
     target_range = pd.date_range(last_date, periods=n_steps, freq=freq) 
-    target_value = np.arange(n_steps, dtype = float)       
+    target_value = np.arange(n_steps, dtype = 'float32')       
     max_rol = max(rolling_window, default=1)     
     lags = list(y.iloc[-(window_length+(max_rol-1)):,0].values)
     ####
@@ -710,10 +710,10 @@ def recursive_forecast_np(y, model, window_length, feature_names,
     
     for i in range(n_steps):                                  
         train = create_features(feature_names, lags, target_range[i]) 
-        train_np = np.array(train, dtype=object)
+        train_np = np.array(train, dtype='float32')
         train_np_s = (train_np.reshape(-1,1))
         new_value = model.predict(train_np_s.reshape(-1,1,len(feature_names)))
-        new_valu_0 = new_value[0][0][0]
+        new_valu_0 = new_value
         target_value[i] = new_valu_0
         lags.pop(0)                                                
         lags.append(new_valu_0)                                   
