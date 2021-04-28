@@ -24,8 +24,9 @@ import numpy as np
 import pandas as pd
 
 import data_input
-
-os.chdir(os.path.dirname(sys.argv[0]))
+import preprocessing
+import prediction
+import plotting
 
 def fast_prediction(filename, freq, targetcol, datecol, 
                     sep, decimal, date_format,
@@ -100,7 +101,6 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                                                    rolling_window=rolling_window)
     
     X_train = X_train.loc[:,~X_train.columns.duplicated()]
-    X_train = X_train.iloc[-2000:,:]
 
     y_horizon = preprocessing.create_horizon(y_train, horizon)
     y_horizon = y_horizon.loc[X_train.index[0]:,:]
@@ -112,7 +112,7 @@ def balanced_prediction(filename, freq, targetcol, datecol,
     X_train_selec = X_train.loc[:, best_features]
 
     regressor = prediction.GLM_Model
-    regressor.fit(X=X_train_selec, 
+    regressor.fit(X=X_train_selec,
                   y=y_horizon.values.ravel())
 
     pred = prediction.recursive_forecast(y=y_train, 
@@ -151,7 +151,6 @@ def slow_prediction(filename, freq, targetcol, datecol,
                                                    rolling_window=rolling_window)
     
     X_train = X_train.loc[:,~X_train.columns.duplicated()]
-    X_train = X_train.iloc[-2000:,:]
 
     y_horizon = preprocessing.create_horizon(y_train, horizon)
     y_horizon = y_horizon.loc[X_train.index[0]:,:]
