@@ -39,7 +39,7 @@ import the prediction models and execute the scripts (changing anything needed f
 ```python
 from ts_automl.pipelines import slow_prediction
 slow_prediction(filename='./example.csv', 
-				freq='15T', 
+		freq='15T', 
                 targetcol='TARGET', 
                 datecol='DATES', 
                 sep=',', 
@@ -51,19 +51,19 @@ slow_prediction(filename='./example.csv',
 ```python
 from ts_automl.pipelines balanced_prediction
 balanced_prediction(filename='./example.csv', 
-					freq='15T', 
-                	targetcol='TARGET', 
-                	datecol='DATES', 
-                	sep=',', 
-                	decimal='.', 
-                	date_format="%d/%m/%Y %H:%M")
+		    freq='15T', 
+            	    targetcol='TARGET', 
+            	    datecol='DATES', 
+            	    sep=',', 
+                    decimal='.', 
+            	    date_format="%d/%m/%Y %H:%M")
 ```
 
 * for fast prediction (KNN Model):
 ```python
 from ts_automl.pipelines import fast_prediction
 fast_prediction(filename='./example.csv', 
-				freq='15T', 
+		freq='15T', 
                 targetcol='TARGET', 
                 datecol='DATES', 
                 sep=',', 
