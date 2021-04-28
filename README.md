@@ -50,7 +50,7 @@ slow_prediction(filename='./example.csv',
 
 * for balanced prediction (LightGBM Model):
 ```python
-from ts_automl.pipelines balanced_prediction
+from ts_automl.pipelines import balanced_prediction
 balanced_prediction(filename='./example.csv', 
 		    freq='15T', 
             	    targetcol='TARGET', 
