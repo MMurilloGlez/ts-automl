@@ -71,6 +71,7 @@ def read_data(filename, targetcol='VALUE', datecol='DATE', sep=';',
     else:
         raise NotImplementedError("This file type is not supported")
 
+    print('data input ok')
     return(file_parsed[targetcol].to_frame())
 
 
@@ -92,7 +93,6 @@ def parsedates(file_, date_format, freq, datecol):
 
     freq = pd.to_timedelta(freq)
     datetime_i = pd.to_datetime(file_[datecol], format=date_format)
-    print(type(datetime_i.iloc[-1]))
     if freq < (datetime_i.iloc[1] - datetime_i.iloc[0]):
         raise ValueError('Expected frequency smaller than dataset information')
 
