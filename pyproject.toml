@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "ts-automl"
+version = "0.1.0"
+description = "An AutoML library for time series forecasting"
+authors = ["Miguel Murillo <mmurillo@cic.es>"]
+license = "MIT"
+readme = "README.md"
+repository = "https://gitlab.corp.cic.es/CIC/IDbox/idbox-ml-i-d/ts-automl"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+keras-tcn = "^3.4.0"
+keras = "^2.4.3"
+sklearn = "^0.0"
+pandas = "^1.2.4"
+plotly = "^4.14.3"
+skits = "^0.1.2"
+lightgbm = "^3.2.1"
+statsmodels = "^0.12.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
