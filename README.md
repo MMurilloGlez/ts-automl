@@ -13,7 +13,8 @@ conda create -n ts_automl_test python=3.8
 clone the github branch to download the installation files
 
 ```
-git clone https://gitlab.corp.cic.es/CIC/IDbox/idbox-ml-i-d/ts-automl/-/tree/develop
+git clone https://gitlab.corp.cic.es/CIC/IDbox/idbox-ml-i-d/ts-automl.git ts-automl
+cd 
 ```
 activate your environment and install wheel
 
@@ -24,7 +25,7 @@ pip install wheel
 install the library using pip install
 
 ```python
-pip install './dist/ts_automl-0.1.0-py3-none-any.whl'
+pip install './ts-automl/dist/ts_automl-0.1.0-py3-none-any.whl'
 ```
 installation will take a while depending on the number of dependencies already on your system
 
@@ -39,7 +40,7 @@ import the prediction models and execute the scripts (changing anything needed f
 ```python
 from ts_automl.pipelines import slow_prediction
 slow_prediction(filename='./example.csv', 
-				freq='15T', 
+		freq='15T', 
                 targetcol='TARGET', 
                 datecol='DATES', 
                 sep=',', 
@@ -49,21 +50,21 @@ slow_prediction(filename='./example.csv',
 
 * for balanced prediction (LightGBM Model):
 ```python
-from ts_automl.pipelines balanced_prediction
+from ts_automl.pipelines import balanced_prediction
 balanced_prediction(filename='./example.csv', 
-					freq='15T', 
-                	targetcol='TARGET', 
-                	datecol='DATES', 
-                	sep=',', 
-                	decimal='.', 
-                	date_format="%d/%m/%Y %H:%M")
+		    freq='15T', 
+            	    targetcol='TARGET', 
+            	    datecol='DATES', 
+            	    sep=',', 
+                    decimal='.', 
+            	    date_format="%d/%m/%Y %H:%M")
 ```
 
 * for fast prediction (KNN Model):
 ```python
 from ts_automl.pipelines import fast_prediction
 fast_prediction(filename='./example.csv', 
-				freq='15T', 
+		freq='15T', 
                 targetcol='TARGET', 
                 datecol='DATES', 
                 sep=',', 
