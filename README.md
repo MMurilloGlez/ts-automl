@@ -13,7 +13,8 @@ conda create -n ts_automl_test python=3.8
 clone the github branch to download the installation files
 
 ```
-git clone https://gitlab.corp.cic.es/CIC/IDbox/idbox-ml-i-d/ts-automl/-/tree/develop
+git clone https://gitlab.corp.cic.es/CIC/IDbox/idbox-ml-i-d/ts-automl.git ts-automl
+cd 
 ```
 activate your environment and install wheel
 
@@ -24,7 +25,7 @@ pip install wheel
 install the library using pip install
 
 ```python
-pip install './dist/ts_automl-0.1.0-py3-none-any.whl'
+pip install './ts-automl/dist/ts_automl-0.1.0-py3-none-any.whl'
 ```
 installation will take a while depending on the number of dependencies already on your system
 
