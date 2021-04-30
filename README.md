@@ -14,7 +14,7 @@ clone the github branch to download the installation files
 
 ```
 git clone https://gitlab.corp.cic.es/CIC/IDbox/idbox-ml-i-d/ts-automl.git ts-automl
-cd 
+cd ts-automl
 ```
 activate your environment and install wheel
 
