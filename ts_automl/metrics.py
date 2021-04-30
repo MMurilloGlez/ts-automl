@@ -7,7 +7,11 @@ such as mse or mape, as well as a measure of error with respect to a naïve
 model.
 """
 
-def mse(y_pred, y_test):
+import numpy as np
+import pandas as pd
+from sklearn import metrics
+
+def mse(y_true, y_pred):
     """mean square error calculation.
 
     Function calculating the mean squared error between the predicted values and
@@ -17,7 +21,7 @@ def mse(y_pred, y_test):
     ----------
     y_pred: np.array
         An array containing all predicted values output by the model
-    y_test: np.array
+    y_true: np.array
         Actual values to test accuracy of prediction
 
     Returns
@@ -28,17 +32,17 @@ def mse(y_pred, y_test):
 
     return error
 
-def rmse(y_pred, y_test):
+def rmse(y_true, y_pred):
     """root mean square error calculation"""
 
     return error
 
-def rsquare(y_pred, y_test):
+def rsquare(y_true, y_pred):
     """R-Square error calculation"""
 
     return error
 
-def mape(y_pred, y_test):
+def mape(y_true, y_pred):
     """Mean absolute percentage error calculation"""
 
     return error
