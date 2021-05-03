@@ -159,25 +159,26 @@ scaler = MinMaxScaler(feature_range=(0,1))
 
 #-------------------------------------------------------------------------------
 def switch_features(value, lags_data, date, rolling_window, num):
-    """Switch for selecting features to add to the initial time series"""
+    """Switch for selecting features to add to the initial time series
 
-    """
-    A switch, that takes as input the 
+    
+    A switch, that takes as input the list of features an lags to create at each
+    iteration of the recursive forecasting process.
     
     Parameters
     ----------
     value: list of str
-
+        list of feature and lag names to create at each recursive forecast point
     X: pd.Dataframe
-
+        input dataframe containing the time series data
     lags_data: list of int
-
+        list of the time lags of the time series
     date: datetime
-        
+        date for which to build the next point in time's data
     rolling_window: list of int
-
+        rolling window on which to calculate the generated features.
     num: int
-
+        number of steps to calculate lags and features with
 
     Returns
     -------
@@ -194,17 +195,6 @@ def switch_features(value, lags_data, date, rolling_window, num):
         'min': lambda : min_feature(lags_data, rolling_window, num),
         'quantile': lambda : quantile_feature(lags_data, rolling_window, num),
         'iqr': lambda : iqr_feature(lags_data, rolling_window, num),
-        'entropy': lambda : entropy_feature(lags_data, rolling_window, num),
-        'trimmean': lambda : trimmean_feature(lags_data, rolling_window, num),
-        'variation': lambda : variation_feature(lags_data, rolling_window, num),
-        'hmean': lambda : hmean_feature(lags_data, rolling_window, num),
-        'gmean': lambda : gmean_feature(lags_data, rolling_window, num),
-        'mad': lambda : mad_feature(lags_data, rolling_window, num),
-#         'gstd': lambda : gstd_feature(lags_data, rolling_window, num),
-        'tvar': lambda : tvar_feature(lags_data, rolling_window, num),
-        'kurtosis': lambda : kurtosis_feature(lags_data, rolling_window, num),
-        'sem': lambda : sem_feature(lags_data, rolling_window, num),
-        'wav': lambda : wav_feature(lags_data, rolling_window, num),
         #--------------------------------------------------------------
         'minute': lambda : minute_feature(date, num),
         'hour': lambda : hour_feature(date, num),
