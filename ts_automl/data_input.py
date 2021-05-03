@@ -2,7 +2,7 @@
 
 A module to input data from a csv file, correctly trasform the data within
 and save the time series in an univariate dataframe with a datetime index
-This module is by default tuned to time series output by IDBoxRT, but 
+This module is by default tuned to time series output by IDBoxRT, but
 parameters may be changed accordingly to allow for other time series.
 
 Parameters
@@ -34,12 +34,12 @@ ValueError
     when the expected frequency is smaller than the one given by the
     input file data.
 NotImplementedError
-    when the filetype or file extension doesn´t conform to the ones implemented.
+    when the filetype or file extension doesn´t conform to the ones implemented
 
 """
 
-import numpy as np
 import pandas as pd
+
 
 def read_data(filename, targetcol='VALUE', datecol='DATE', sep=';',
               decimal=',', date_format="%d/%m/%Y %H:%M:%S.%f", freq='1T'):
@@ -47,7 +47,7 @@ def read_data(filename, targetcol='VALUE', datecol='DATE', sep=';',
     """Read data from file and parse it"""
 
     """
-    
+
     Reads data from csv or xls file, parsing all date values while doing so.
     Calls parsedates to parse the file and interpolate to the given frequency
 
@@ -56,7 +56,7 @@ def read_data(filename, targetcol='VALUE', datecol='DATE', sep=';',
 
     pd.Dataframe
         Univariate dataframe containing the interpolated time series.
-    
+
     """
 
     if filename[-3:] == 'csv' or filename[-3:] == 'txt':
@@ -85,10 +85,10 @@ def parsedates(file_, date_format, freq, datecol):
 
     Returns
     -------
-    
+
     pd.Dataframe
         Univariate dataframe containing the interpolated time series.
-    
+
     """
 
     freq = pd.to_timedelta(freq)
