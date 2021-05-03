@@ -72,3 +72,32 @@ fast_prediction(filename='./example.csv',
                 date_format="%d/%m/%Y %H:%M")
 ```
 
+* for naïve prediction (mean of last 50 values) (not recommended except for comparison with other models): 
+```python
+from ts_automl.pipelines import naive_prediction
+naive_prediction(filename='./example.csv', 
+		freq='15T', 
+                targetcol='TARGET', 
+                datecol='DATES', 
+                sep=',', 
+                decimal='.', 
+                date_format="%d/%m/%Y %H:%M")
+```
+
+## Optional parameters
+
+* for fast, balanced and slow prediction:
+```python
+
+
+```
+
+
+* for naïve prediction:
+
+```python
+
+
+```
+
+
