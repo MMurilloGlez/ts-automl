@@ -1,21 +1,9 @@
-"""Module containing the sklearn pipelines for time series forecasting"""
+"""Module containing the sklearn pipelines for time series forecasting
 
-"""
+
 This module contains the sklearn pipelines for the different levels of forecast
 'difficulty'. Three will be proposed, a fast, a balanced and a slow prediction,
 each sacrificing processing time for forecasting accuracy.
-
-Parameters
-----------
-forecast_type: str {'slow','balanced','fast'}
-    type of forecasting desired, goal is to automate this in terms of desired 
-    processing time, frequency and time window
-
-Returns
--------
-sklearn.pipeline
-    sklearn pipeline containing all steps including preprocessing, feature
-    selection and prediction for the desired forecast type.
 
 """
 import os
@@ -94,7 +82,7 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                               decimal=decimal,
                               date_format=date_format)
 
-    y_train, y_test = preprocessing.ts_split(df, test_size=50)
+    y_train, y_test = preprocessing.ts_split(df, test_size=points)
     X_train = preprocessing.create_sample_features(y_train, 
                                                    window_length=window_length, 
                                                    features=features, 
@@ -145,7 +133,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
                               decimal=decimal,
                               date_format=date_format)
 
-    y_train, y_test = preprocessing.ts_split(df, test_size=50)
+    y_train, y_test = preprocessing.ts_split(df, test_size=points)
     y_train= y_train.iloc[-num_datapoints:,:]
 
     X_train = preprocessing.create_sample_features(y_train, 
@@ -181,3 +169,28 @@ def slow_prediction(filename, freq, targetcol, datecol,
         plotting.plot_test_pred(y_test, pred)
     
     return(pred)
+
+def naive_prediction(filename, freq, targetcol, datecol, 
+                    sep, decimal, date_format,
+                    points=50, num_datapoints=2000, plot=False):
+    
+    
+    df = data_input.read_data(filename=filename,
+                              freq=freq,
+                              targetcol=targetcol,
+                              datecol=datecol,
+                              sep=sep,
+                              decimal=decimal,
+                              date_format=date_format)
+
+    y_train, y_test = preprocessing.ts_split(df, test_size=points)
+    y_train = y_train.iloc[-num_datapoints:,:]
+
+    regressor = prediction.Naive_model()
+
+    regressor.fit(y_train)
+
+    pred = regressor.predict(fh=[range(1,points+1)])
+
+    return(pred)
+

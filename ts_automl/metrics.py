@@ -10,7 +10,7 @@ model.
 import numpy as np
 import pandas as pd
 from sklearn import metrics
-from sktime.forecasting.naive import NaiveForecaster
+
 
 #--Traditional------------------------------------------------------------------
 
@@ -60,15 +60,62 @@ def exp_var(y_true, y_pred):
     
     return error
 
+
+def switch_abs_error(value, y_true, y_pred):
+    """Switch for selecting error metrics for prediction tasks
+    
+    
+    A switch, that takes as input the list of error metrics to be calculated for
+    a forecasting task and calls the corresponding calculations.
+
+    Parameters
+    ----------
+    value: list of str
+        list of the error metric to calculate
+    y_true: np.array
+        array of true values from the test dataset
+    y_pred: np.array
+        array of predicted values from the ML model
+    
+    Returns: function call
+        function call to the corresponding metric or metric to be calculated for
+        the forecasting task
+    """
+
+    return {
+        'mse': lambda : mse(y_true, y_pred),
+        'rmse': lambda : rmse(y_true, y_pred),
+        'mape': lambda : mape(y_true, y_pred),
+        'r2': lambda : rsquare(y_true, y_pred),
+        'exp_var': lambda : exp_var(y_true, y_pred)
+    }.get(value)()
+
 #--With respect to naive-----------------------------------------------------------------------------
 
-def relative_error(y_pred, y_test):
+def relative_error(y_true, y_pred, y_naive):
     """Relative error improvement with respect to a naïve prediction model
+
+    Takes the original time series as an input as well as y_pred and y_true. 
+    Performs a naive forecast on the time series and returns the relative mse 
+    error of the ML model with respect to the naive one.
+
+    Parameters
+    ----------
+    y_true: np.array
+
+    y_pred: np.array
+
+    X: pd.Series
+
+    horizon: list of int
 
     Returns
     -------
     float
         Percentage of improvement with respect to naive model
     """
-    naive = NaiveForecaster(strategy='mean', window_length=window)
+    error_naive = mse(y_true, Y_naive)
+    error_pred = mse(y_true, y_pred)
+    error = 100*(error_pred/error_naive)
+
     return error

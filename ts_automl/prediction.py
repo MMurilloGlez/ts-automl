@@ -28,6 +28,8 @@ import statsmodels.api as sm
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.preprocessing import MinMaxScaler
 
+from sktime.forecasting.naive import NaiveForecaster
+
 from keras.preprocessing.sequence import TimeseriesGenerator
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
@@ -38,38 +40,6 @@ from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.linear_model import TweedieRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from lightgbm.sklearn import LGBMRegressor
-
-class glm_forecaster(BaseEstimator, RegressorMixin):
-    """ A sklearn-style wrapper for statsmodels glm regressor 
-
-    
-    GLM model from statsmodels wrapped into sklearn-friendly wrapper. so fit and
-    predict can be called simply.
-
-    Parameters
-    ----------
-    sm.GLM: statsmodels Model
-        GLM model from the statsmodels library
-    Returns
-    -------
-    sklearn model:
-        Model adapted so it can be included in sklearn pipelines and used with 
-        sklearn's own functions.
-    """
-
-    def __init__(self, model_class=sm.GLM,
-                 fit_intercept=True):
-        self.model_class = model_class
-        self.fit_intercept = fit_intercept
-    def fit(self, X, y):
-        if self.fit_intercept:
-            X = sm.add_constant(X)
-        self.model_ = self.model_class(y, X, family=sm.families.Gaussian())
-        self.results_ = self.model_.fit()
-    def predict(self, X):
-        if self.fit_intercept:
-            X = sm.add_constant(X)
-        return self.results_.predict(X)
 
 
 def LSTM_Model_gen(n_feat):
@@ -152,9 +122,11 @@ def Mixed_Model(n_feat):
     return KerasRegressor(build_fn=(lambda: Mixed_Model_gen(n_feat)), 
                           verbose=1,  batch_size=16,
                           epochs=10)
+
 KNN_Model = KNeighborsRegressor(n_neighbors=20, n_jobs=-1)
 LGB_Model = LGBMRegressor()
 GLM_Model = glm_forecaster()
+Naive_Model = NaiveForecaster(strategy='mean')
 scaler = MinMaxScaler(feature_range=(0,1))
 
 #-------------------------------------------------------------------------------
