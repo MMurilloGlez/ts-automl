@@ -11,14 +11,16 @@ from ts_automl import data_input
 from ts_automl import preprocessing
 from ts_automl import prediction
 from ts_automl import plotting
+from ts_automl import metrics
 
 
 def fast_prediction(filename, freq, targetcol, datecol,
                     sep, decimal, date_format,
                     points=50, window_length=50, rolling_window=[5, 10, 20],
-                    horizon=1, step=1,
+                    horizon=1, step=1, num_datapoints=2000,
                     features=['mean', 'std', 'max', 'min', 'minute'],
-                    selected_feat=20, plot=True):
+                    selected_feat=20, plot=True, error=['mse', 'mape'],
+                    rel_metrics=True):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -35,7 +37,7 @@ def fast_prediction(filename, freq, targetcol, datecol,
                                                    rolling_window=rolling_window)
 
     X_train = X_train.loc[:, ~X_train.columns.duplicated()]
-    X_train = X_train.iloc[-2000:, :]
+    X_train = X_train.iloc[-num_datapoints:, :]
 
     y_horizon = preprocessing.create_horizon(y_train, horizon)
     y_horizon = y_horizon.loc[X_train.index[0]:, :]
@@ -61,6 +63,19 @@ def fast_prediction(filename, freq, targetcol, datecol,
     if plot:
         plotting.plot_test_pred(y_test, pred)
 
+    if error:
+        abs_error = metrics.switch_abs_error(error, y_test, pred)
+        print(abs_error)
+
+    if rel_metrics:
+        naive = naive_prediction(filename=filename, freq=freq,
+                                 targetcol=targetcol, datecol=datecol,
+                                 sep=sep, decimal=decimal,
+                                 date_format=date_format, points=points,
+                                 num_datapoints=num_datapoints)
+        r_error = metrics.relative_error(y_test, pred, naive)
+        print(r_error)
+
     return(pred)
 
 
@@ -69,7 +84,9 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                         points=50, window_length=100,
                         rolling_window=[5, 10, 20], horizon=1, step=1,
                         features=['mean', 'std', 'max', 'min', 'minute'],
-                        selected_feat=40, plot=True):
+                        selected_feat=40, num_datapoints=2000,
+                        plot=True, error=['mse', 'mape'],
+                        rel_metrics=True):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -111,6 +128,19 @@ def balanced_prediction(filename, freq, targetcol, datecol,
     if plot:
         plotting.plot_test_pred(y_test, pred)
 
+    if error:
+        abs_error = metrics.switch_abs_error(error, y_test, pred)
+        print(abs_error)
+
+    if rel_metrics:
+        naive = naive_prediction(filename=filename, freq=freq,
+                                 targetcol=targetcol, datecol=datecol,
+                                 sep=sep, decimal=decimal,
+                                 date_format=date_format, points=points,
+                                 num_datapoints=num_datapoints)
+        r_error = metrics.relative_error(y_test, pred, naive)
+        print(r_error)
+
     return(pred)
 
 
@@ -120,7 +150,8 @@ def slow_prediction(filename, freq, targetcol, datecol,
                     horizon=1, step=1,
                     features=['mean', 'std', 'max', 'min', 'minute'],
                     selected_feat=50, num_datapoints=2000,
-                    plot=True):
+                    plot=True, error=['mse', 'mape'],
+                    rel_metrics=True):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -163,6 +194,19 @@ def slow_prediction(filename, freq, targetcol, datecol,
 
     if plot:
         plotting.plot_test_pred(y_test, pred)
+
+    if error:
+        abs_error = metrics.switch_abs_error(error, y_test, pred)
+        print(abs_error)
+
+    if rel_metrics:
+        naive = naive_prediction(filename=filename, freq=freq,
+                                 targetcol=targetcol, datecol=datecol,
+                                 sep=sep, decimal=decimal,
+                                 date_format=date_format, points=points,
+                                 num_datapoints=num_datapoints)
+        r_error = metrics.relative_error(y_test, pred, naive)
+        print(r_error)
 
     return(pred)
 
