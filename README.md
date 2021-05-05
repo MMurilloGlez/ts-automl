@@ -72,3 +72,53 @@ fast_prediction(filename='./example.csv',
                 date_format="%d/%m/%Y %H:%M")
 ```
 
+* for naïve prediction (mean of last 50 values) (not recommended except for comparison with other models): 
+```python
+from ts_automl.pipelines import naive_prediction
+naive_prediction(filename='./example.csv', 
+		freq='15T', 
+                targetcol='TARGET', 
+                datecol='DATES', 
+                sep=',', 
+                decimal='.', 
+                date_format="%d/%m/%Y %H:%M")
+```
+
+## Optional parameters
+
+* for fast, balanced and slow prediction:
+```python
+points: int 
+        Size of the horizon to predict in the future
+window_length: int
+        Number of points in the past to obtain lags for
+rolling_window: list of int
+        rolling window size to calculate the features
+selected_feat: int
+        Number of features to retain in feature selection.
+num_datapoints: int
+        Size of the training set for the models
+plot: bool
+        Whether to plot or not the results
+error: list of str ['mape','mse','r2', 'exp_var']
+        Error metrics to calculate with respect to the test data 
+rel_error: bool
+        Whether or not to calculate the error relative to naive forecast
+
+```
+
+
+* for naïve prediction:
+
+```python
+points: int 
+        Size of the horizon to predict in the future
+num_datapoints: int
+        Size of the training set for the models
+plot: bool
+        Whether to plot or not the results
+error: list of str ['mape','mse','r2', 'exp_var']
+        Error metrics to calculate with respect to the test data 
+```
+
+
