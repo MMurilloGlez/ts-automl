@@ -6,6 +6,7 @@ This module contains the sklearn pipelines for the different levels of forecast
 each sacrificing processing time for forecasting accuracy.
 
 """
+import numpy as np
 
 from ts_automl import data_input
 from ts_automl import preprocessing
@@ -64,7 +65,10 @@ def fast_prediction(filename, freq, targetcol, datecol,
         plotting.plot_test_pred(y_test, pred)
 
     if error:
-        abs_error = metrics.switch_abs_error(error, y_test, pred)
+        abs_error = []
+        for i in error:
+            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
+        print(error)
         print(abs_error)
 
     if rel_metrics:
@@ -74,6 +78,7 @@ def fast_prediction(filename, freq, targetcol, datecol,
                                  date_format=date_format, points=points,
                                  num_datapoints=num_datapoints)
         r_error = metrics.relative_error(y_test, pred, naive)
+        print('error relative to naïve prediction')
         print(r_error)
 
     return(pred)
@@ -129,7 +134,10 @@ def balanced_prediction(filename, freq, targetcol, datecol,
         plotting.plot_test_pred(y_test, pred)
 
     if error:
-        abs_error = metrics.switch_abs_error(error, y_test, pred)
+        abs_error = []
+        for i in error:
+            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
+        print(error)
         print(abs_error)
 
     if rel_metrics:
@@ -139,6 +147,7 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                                  date_format=date_format, points=points,
                                  num_datapoints=num_datapoints)
         r_error = metrics.relative_error(y_test, pred, naive)
+        print('error relative to naïve prediction')
         print(r_error)
 
     return(pred)
@@ -196,7 +205,10 @@ def slow_prediction(filename, freq, targetcol, datecol,
         plotting.plot_test_pred(y_test, pred)
 
     if error:
-        abs_error = metrics.switch_abs_error(error, y_test, pred)
+        abs_error = []
+        for i in error:
+            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
+        print(error)
         print(abs_error)
 
     if rel_metrics:
@@ -206,6 +218,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
                                  date_format=date_format, points=points,
                                  num_datapoints=num_datapoints)
         r_error = metrics.relative_error(y_test, pred, naive)
+        print('error relative to naïve prediction')
         print(r_error)
 
     return(pred)
@@ -213,7 +226,8 @@ def slow_prediction(filename, freq, targetcol, datecol,
 
 def naive_prediction(filename, freq, targetcol, datecol,
                      sep, decimal, date_format,
-                     points=50, num_datapoints=2000, plot=False):
+                     points=50, num_datapoints=2000, plot=False,
+                     error=['mse', 'mape']):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -222,14 +236,25 @@ def naive_prediction(filename, freq, targetcol, datecol,
                               sep=sep,
                               decimal=decimal,
                               date_format=date_format)
-
+    df = df.squeeze()
     y_train, y_test = preprocessing.ts_split(df, test_size=points)
-    y_train = y_train.iloc[-num_datapoints:, :]
+    y_train = y_train.iloc[-num_datapoints:]
 
-    regressor = prediction.Naive_model()
+    regressor = prediction.Naive_Model()
 
     regressor.fit(y_train)
 
-    pred = regressor.predict(fh=[range(1, points+1)])
+    pred = regressor.predict(fh=np.arange(len(y_test)) + 1)
+
+    if plot:
+        plotting.plot_test_pred(y_test.to_frame(), pred)
+
+    if error:
+        abs_error = []
+        for i in error:
+            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
+        print('Naïve error metrics:')
+        print(error)
+        print(abs_error)
 
     return(pred)
