@@ -15,6 +15,8 @@ from sklearn.preprocessing import MinMaxScaler
 
 from sktime.forecasting.naive import NaiveForecaster
 
+import statsmodels.api as sm
+
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
 from tensorflow.keras.metrics import MeanAbsolutePercentageError
@@ -113,10 +115,13 @@ def Mixed_Model(n_feat):
                           epochs=10)
 
 
+def GLM_Model():
+    return(lambda: sm.GLM(family=sm.families.Gamma()))
+
+
+Naive_Model = NaiveForecaster
 KNN_Model = KNeighborsRegressor(n_neighbors=20, n_jobs=-1)
 LGB_Model = LGBMRegressor()
-# GLM_Model = glm_forecaster()
-Naive_Model = NaiveForecaster(strategy='mean')
 scaler = MinMaxScaler(feature_range=(0, 1))
 
 
