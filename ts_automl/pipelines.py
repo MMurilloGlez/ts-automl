@@ -81,7 +81,7 @@ def fast_prediction(filename, freq, targetcol, datecol,
         print('error relative to naïve prediction')
         print(r_error)
 
-    return(pred)
+    return pred, abs_error, r_error
 
 
 def balanced_prediction(filename, freq, targetcol, datecol,
@@ -150,7 +150,7 @@ def balanced_prediction(filename, freq, targetcol, datecol,
         print('error relative to naïve prediction')
         print(r_error)
 
-    return(pred)
+    return pred,  abs_error, r_error
 
 
 def slow_prediction(filename, freq, targetcol, datecol,
@@ -221,7 +221,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
         print('error relative to naïve prediction')
         print(r_error)
 
-    return(pred)
+    return pred, abs_error, r_error
 
 
 def naive_prediction(filename, freq, targetcol, datecol,
@@ -257,4 +257,4 @@ def naive_prediction(filename, freq, targetcol, datecol,
         print(error)
         print(abs_error)
 
-    return(pred)
+    return pred
