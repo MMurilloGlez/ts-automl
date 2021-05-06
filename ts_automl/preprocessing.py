@@ -320,13 +320,6 @@ def switch_sample_features(value, X, lags_X, rolling_window):
     }.get(value)()
 
 
-def switch_optimization(value, regressor):
-    return {
-        'tpe': lambda : tpe_optimization(),
-        'pso': lambda : pso_optimization(),
-    }.get(value)()
-
-
 #-------------------------------------------------------------------------------
 
 def create_horizon(df, horizon):
