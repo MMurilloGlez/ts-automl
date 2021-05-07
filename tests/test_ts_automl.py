@@ -4,6 +4,10 @@ from ts_automl.pipelines import balanced_prediction
 from ts_automl.pipelines import slow_prediction
 
 
+def test_version():
+    assert __version__ == '0.1.1'
+
+
 def test_fast_1():
     """Test for fast prediction time, using knn, series 1"""
     p, e, r = fast_prediction(filename='./tests/test_series/Serie1.csv',
@@ -207,24 +211,3 @@ def test_slow_5():
                               decimal=',',
                               date_format="%d/%m/%Y %H:%M:%S.%f",
                               plot=False)
-def test_version():
-    assert __version__ == '0.1.1'
-
-
-def slow_prediction_test():
-
-    rel_error = 0
-    assert rel_error < 100
-
-
-def bal_prediction_test():
-
-    rel_error = 0
-    assert rel_error < 100
-
-
-def fast_prediction_test():
-
-    rel_error = 0
-    assert rel_error < 100
-
