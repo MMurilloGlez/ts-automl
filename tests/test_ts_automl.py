@@ -38,7 +38,7 @@ def test_fast_2():
 
 def test_fast_3():
     """Test for fast prediction time, using knn, series 3"""
-    p, e, r = fast_prediction(filename='./tests/test_series/serie3.csv',
+    p, e, r = fast_prediction(filename='./tests/test_series/Serie3.csv',
                               freq='15T',
                               targetcol='INSTALACIONES [kWh]',
                               datecol='MSJO_DATUM',
