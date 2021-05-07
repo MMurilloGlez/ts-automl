@@ -1,3 +1,4 @@
+
 ## Installation
 
 Create a python 3.8 virtual environment into which to install the library
@@ -100,12 +101,9 @@ error: list of str ['mape','mse','r2', 'exp_var']
         Error metrics to calculate with respect to the test data 
 rel_error: bool
         Whether or not to calculate the error relative to naive forecast
-
 ```
 
-
 * for naïve prediction:
-
 ```python
 points: int 
         Size of the horizon to predict in the future
