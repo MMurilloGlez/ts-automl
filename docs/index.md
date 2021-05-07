@@ -1,7 +1,3 @@
-# ts-automl
-
-### An automated machine learning library for time series forecasting in python
-
 ## Installation
 
 Create a python 3.8 virtual environment into which to install the library
