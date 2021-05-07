@@ -189,7 +189,7 @@ def test_slow_2():
 
 def test_slow_3():
     """Test for slow prediction time, using keras, series 3"""
-    p, e, r = slow_prediction(filename='./tests/test_series/serie3.csv',
+    p, e, r = slow_prediction(filename='./tests/test_series/Serie3.csv',
                               freq='15T',
                               targetcol='INSTALACIONES [kWh]',
                               datecol='MSJO_DATUM',
