@@ -240,8 +240,8 @@ def quantile_sample(X, rolling_window=2):
 def iqr_sample(series, rolling_window=2):
     r_in = []
     for i in list(range(len(series)-rolling_window+1)):
-        iqr_sc = scipy.stats.iqr(series.iloc[i:rolling_window+i, :]
-        r_in.append(iqr_sc, axis=0))
+        iqr_sc = scipy.stats.iqr(series.iloc[i:rolling_window+i, :])
+        r_in.append(iqr_sc, axis=0)
     r_in = pd.DataFrame(r_in)
     r_in.index = series.iloc[rolling_window-1:, :].index
     r_in.columns = series.columns
