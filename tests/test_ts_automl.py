@@ -5,11 +5,25 @@ from ts_automl.pipelines import slow_prediction
 
 
 def test_version():
+    """
+    Test for validating the package version installed.
+
+    Will pass if version is same as the one expected by the test.
+    """
+
     assert __version__ == '0.1.1'
 
 
 def test_fast_1():
-    """Test for fast prediction time, using knn, series 1"""
+    """
+    Test for fast prediction time, using knn, series 1
+
+    Uses a reference time series from test_series path, launches a prediction
+    model on it using the respective model, and compares the result with the
+    naive prediction for the same series. If the prediction mse is lower in
+    comparison with the naive model, the test will pass
+    """
+
     p, e, r = fast_prediction(filename='./tests/test_series/Serie1.csv',
                               freq='10T',
                               targetcol='VALUE',
