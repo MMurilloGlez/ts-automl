@@ -2,6 +2,8 @@
 
 ### An automated machine learning library for time series forecasting in python
 
+[![codecov](https://codecov.io/gh/MMurilloGlez/ts-automl/branch/master/graph/badge.svg?token=N85DT683O3)](https://codecov.io/gh/MMurilloGlez/ts-automl)
+
 ## Installation
 
 Create a python 3.8 virtual environment into which to install the library
