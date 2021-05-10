@@ -24,7 +24,8 @@ jobs:
       run: |
         tree -a -f
         python -m pip install --upgrade pip
-        pip install flake8 pytest
+        pip install flake8 pytest pytest-cov
+pytest --cov=./
         pip install "./dist/ts_automl-0.1.1-py3-none-any.whl"
     - name: Lint with flake8
       run: |
@@ -34,7 +35,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest
+        pytest --cov=./
     - name: Codecov Report
       if: always()
       uses: codecov/codecov-action@v1
