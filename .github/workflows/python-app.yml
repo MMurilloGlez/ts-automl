@@ -25,7 +25,6 @@ jobs:
         tree -a -f
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov
-pytest --cov=./
         pip install "./dist/ts_automl-0.1.1-py3-none-any.whl"
     - name: Lint with flake8
       run: |
