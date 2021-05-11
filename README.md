@@ -37,7 +37,7 @@ installation will take a while depending on the number of dependencies already o
 import the prediction models and execute the scripts (changing anything needed for the particular series)
 
 
-* for slow prediction (LSTM Model):
+* for slow prediction (LSTM + LightGBM + KNN):
 ```python
 from ts_automl.pipelines import slow_prediction
 slow_prediction(filename='./example.csv', 
@@ -49,7 +49,7 @@ slow_prediction(filename='./example.csv',
                 date_format="%d/%m/%Y %H:%M")
 ```
 
-* for balanced prediction (LightGBM Model):
+* for balanced prediction (LightGBM + KNN):
 ```python
 from ts_automl.pipelines import balanced_prediction
 balanced_prediction(filename='./example.csv', 

@@ -11,7 +11,7 @@ def test_version():
     Will pass if version is same as the one expected by the test.
     """
 
-    assert __version__ == '0.1.1'
+    assert __version__ == '0.1.2'
 
 
 def test_fast_1():

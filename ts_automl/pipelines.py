@@ -118,17 +118,40 @@ def balanced_prediction(filename, freq, targetcol, datecol,
 
     X_train_selec = X_train.loc[:, best_features]
 
-    regressor = prediction.LGB_Model
-    regressor.fit(X=X_train_selec,
-                  y=y_horizon.values.ravel())
+    regressor_1 = prediction.KNN_Model
+    regressor_1.fit(X=X_train_selec,
+                    y=y_horizon.values.ravel())
 
-    pred = prediction.recursive_forecast(y=y_train,
-                                         model=regressor,
-                                         window_length=window_length,
-                                         feature_names=best_features,
-                                         rolling_window=rolling_window,
-                                         n_steps=points,
-                                         freq=freq)
+    pred_1 = prediction.recursive_forecast(y=y_train,
+                                           model=regressor_1,
+                                           window_length=window_length,
+                                           feature_names=best_features,
+                                           rolling_window=rolling_window,
+                                           n_steps=points,
+                                           freq=freq)
+
+    error_1 = metrics.switch_abs_error('mse', y_test, pred_1)
+
+    regressor_2 = prediction.LGB_Model
+    regressor_2.fit(X=X_train_selec,
+                    y=y_horizon.values.ravel())
+
+    pred_2 = prediction.recursive_forecast(y=y_train,
+                                           model=regressor_2,
+                                           window_length=window_length,
+                                           feature_names=best_features,
+                                           rolling_window=rolling_window,
+                                           n_steps=points,
+                                           freq=freq)
+
+    error_2 = metrics.switch_abs_error('mse', y_test, pred_2)
+
+    if error_1 < error_2:
+        pred = pred_1
+        print('Used KNN Model')
+    else:
+        pred = pred_2
+        print('Used LightGBM Model')
 
     if plot:
         plotting.plot_test_pred(y_test, pred)
@@ -189,17 +212,57 @@ def slow_prediction(filename, freq, targetcol, datecol,
 
     X_train_selec = X_train.loc[:, best_features]
 
-    regressor = prediction.LSTM_Model(n_feat=selected_feat)
-    regressor.fit(x=X_train_selec.to_numpy().reshape(-1, 1, selected_feat),
-                  y=y_horizon.values.ravel())
+    regressor_1 = prediction.KNN_Model
+    regressor_1.fit(X=X_train_selec,
+                    y=y_horizon.values.ravel())
 
-    pred = prediction.recursive_forecast_np(y=y_train,
-                                            model=regressor,
-                                            window_length=window_length,
-                                            feature_names=best_features,
-                                            rolling_window=rolling_window,
-                                            n_steps=points,
-                                            freq=freq)
+    pred_1 = prediction.recursive_forecast(y=y_train,
+                                           model=regressor_1,
+                                           window_length=window_length,
+                                           feature_names=best_features,
+                                           rolling_window=rolling_window,
+                                           n_steps=points,
+                                           freq=freq)
+
+    error_1 = metrics.switch_abs_error('mse', y_test, pred_1)
+
+    regressor_2 = prediction.LGB_Model
+    regressor_2.fit(X=X_train_selec,
+                    y=y_horizon.values.ravel())
+
+    pred_2 = prediction.recursive_forecast(y=y_train,
+                                           model=regressor_2,
+                                           window_length=window_length,
+                                           feature_names=best_features,
+                                           rolling_window=rolling_window,
+                                           n_steps=points,
+                                           freq=freq)
+
+    error_2 = metrics.switch_abs_error('mse', y_test, pred_2)
+
+    regressor_3 = prediction.LSTM_Model(n_feat=selected_feat)
+    regressor_3.fit(x=X_train_selec.to_numpy().reshape(-1, 1, selected_feat),
+                    y=y_horizon.values.ravel())
+
+    pred_3 = prediction.recursive_forecast_np(y=y_train,
+                                              model=regressor_3,
+                                              window_length=window_length,
+                                              feature_names=best_features,
+                                              rolling_window=rolling_window,
+                                              n_steps=points,
+                                              freq=freq)
+
+    error_3 = metrics.switch_abs_error('mse', y_test, pred_3)
+
+    if (error_3 < error_2) & (error_3 < error_1):
+        pred = pred_3
+        print('Using LSTM prediction')
+    elif(error_2 < error_1) & (error_2 < error_3):
+        pred = pred_2
+        print('Using LightGBM prediction')
+    else:
+        pred = pred_1
+        print('Using KNN Prediction')
 
     if plot:
         plotting.plot_test_pred(y_test, pred)
