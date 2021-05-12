@@ -113,3 +113,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+ts_automl/optimization.py
+.vscode/settings.json
