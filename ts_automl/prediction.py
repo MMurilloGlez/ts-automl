@@ -26,6 +26,9 @@ from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from lightgbm.sklearn import LGBMRegressor
 
+from hpsklearn import HyperoptEstimator, knn_regression, lightgbm_regression
+from hyperopt import tpe
+
 
 def LSTM_Model_gen(n_feat):
     """
@@ -120,8 +123,14 @@ def GLM_Model():
 
 
 Naive_Model = NaiveForecaster
-KNN_Model = KNeighborsRegressor(n_neighbors=20, n_jobs=-1)
-LGB_Model = LGBMRegressor()
+KNN_Model = KNeighborsRegressor(n_jobs=-1)
+LGB_Model = LGBMRegressor(n_jobs=-1)
+KNN_Model_Opt = HyperoptEstimator(regressor=knn_regression('knnopt'),
+                                  algo=tpe.suggest,
+                                  max_evals=10)
+LGB_Model_Opt = HyperoptEstimator(regressor=lightgbm_regression('lgbmopt'),
+                                  algo=tpe.suggest,
+                                  max_evals=10)
 scaler = MinMaxScaler(feature_range=(0, 1))
 
 
