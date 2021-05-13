@@ -26,8 +26,9 @@ from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.neighbors import KNeighborsRegressor
 from lightgbm.sklearn import LGBMRegressor
 
-from hpsklearn import HyperoptEstimator, knn_regression, lightgbm_regression
-from hyperopt import tpe
+from hpsklearn import HyperoptEstimator as HE, knn_regression as knn_reg
+from hpsklearn import lightgbm_regression as lgb_reg
+from hyperopt import tpe, hp
 
 
 def LSTM_Model_gen(n_feat):
@@ -122,15 +123,37 @@ def GLM_Model():
     return(lambda: sm.GLM(family=sm.families.Gamma()))
 
 
+lgb_reg_params = {
+    'learning_rate': hp.choice('learning_rate', np.arange(0.02, 0.5, 0.05)),
+    'max_depth': hp.choice('max_depth', np.arange(2, 20, 1, dtype=int)),
+    'min_child_weight': hp.choice('min_child_weight', np.arange(0, 5, 1)),
+    'colsample_bytree': hp.choice('colsample_bytree',
+                                  np.arange(0.1, 0.6, 0.1)),
+    'subsample': hp.choice('subsample', np.arange(0.1, 1, 0.05)),
+    'n_estimators': hp.choice('n_estimators',
+                              np.arange(10, 400, 25, dtype=int)),
+    'num_leaves': hp.choice('num_leaves', np.arange(10, 100, 15, dtype=int)),
+    'reg_alpha': hp.choice('reg_alpha', np.arange(0.1, 1, 0.1)),
+    'reg_lambda': hp.choice('reg_lambda', np.arange(0.5, 1.5, 0.1))
+    }
+
+knn_reg_params = {
+    'n_neighbors': hp.choice('n_neighbors', np.arange(5, 50, 5)),
+    'weights': hp.choice('weights', ['uniform', 'distance']),
+    'leaf_size': hp.choice('leaf_size', np.arange(30, 60, 10)),
+    'n_jobs': hp.choice('n_jobs', [-1])
+
+    }
+
 Naive_Model = NaiveForecaster
 KNN_Model = KNeighborsRegressor(n_jobs=-1)
 LGB_Model = LGBMRegressor(n_jobs=-1)
-KNN_Model_Opt = HyperoptEstimator(regressor=knn_regression('knnopt'),
-                                  algo=tpe.suggest,
-                                  max_evals=5)
-LGB_Model_Opt = HyperoptEstimator(regressor=lightgbm_regression('lgbmopt'),
-                                  algo=tpe.suggest,
-                                  max_evals=5)
+KNN_Model_Opt = HE(regressor=knn_reg('knnopt', **knn_reg_params),
+                   algo=tpe.suggest,
+                   max_evals=5)
+LGB_Model_Opt = HE(regressor=lgb_reg('lgbmopt', **lgb_reg_params),
+                   algo=tpe.suggest,
+                   max_evals=5)
 scaler = MinMaxScaler(feature_range=(0, 1))
 
 
