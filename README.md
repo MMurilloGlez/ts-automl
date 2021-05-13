@@ -2,7 +2,7 @@
 
 ### An automated machine learning library for time series forecasting in python
 
-[![codecov](https://codecov.io/gh/MMurilloGlez/ts-automl/branch/master/graph/badge.svg?token=N85DT683O3)](https://codecov.io/gh/MMurilloGlez/ts-automl)[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMMurilloGlez%2Fts-automl.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FMMurilloGlez%2Fts-automl?ref=badge_shield)
+[![codecov](https://codecov.io/gh/MMurilloGlez/ts-automl/branch/master/graph/badge.svg?token=N85DT683O3)](https://codecov.io/gh/MMurilloGlez/ts-automl)   [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMMurilloGlez%2Fts-automl.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FMMurilloGlez%2Fts-automl?ref=badge_shield)   [![Known Vulnerabilities](https://snyk.io/test/github/MMurilloGlez/ts-automl/badge.svg)](https://snyk.io/test/github/MMurilloGlez/ts-automl)
 
 ## Installation
 
