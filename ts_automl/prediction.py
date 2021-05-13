@@ -127,10 +127,10 @@ KNN_Model = KNeighborsRegressor(n_jobs=-1)
 LGB_Model = LGBMRegressor(n_jobs=-1)
 KNN_Model_Opt = HyperoptEstimator(regressor=knn_regression('knnopt'),
                                   algo=tpe.suggest,
-                                  max_evals=10)
+                                  max_evals=5)
 LGB_Model_Opt = HyperoptEstimator(regressor=lightgbm_regression('lgbmopt'),
                                   algo=tpe.suggest,
-                                  max_evals=10)
+                                  max_evals=5)
 scaler = MinMaxScaler(feature_range=(0, 1))
 
 

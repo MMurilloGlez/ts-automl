@@ -21,7 +21,7 @@ def fast_prediction(filename, freq, targetcol, datecol,
                     horizon=1, step=1, num_datapoints=2000,
                     features=['mean', 'std', 'max', 'min', 'minute'],
                     selected_feat=20, plot=True, error=['mse', 'mape'],
-                    rel_metrics=True):
+                    rel_metrics=True, opt=False):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -61,6 +61,20 @@ def fast_prediction(filename, freq, targetcol, datecol,
                                          n_steps=points,
                                          freq=freq)
 
+    if opt:
+
+        regressor_1_o = prediction.KNN_Model_Opt
+        regressor_1_o.fit(X=X_train_selec,
+                          y=y_horizon.values.ravel())
+        pred_1_o = prediction.recursive_forecast(y=y_train,
+                                                 model=regressor_1_o,
+                                                 window_length=window_length,
+                                                 feature_names=best_features,
+                                                 rolling_window=rolling_window,
+                                                 n_steps=points,
+                                                 freq=freq)
+        pred = pred_1_o
+
     if plot:
         plotting.plot_test_pred(y_test, pred)
 
@@ -91,7 +105,7 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                         features=['mean', 'std', 'max', 'min', 'minute'],
                         selected_feat=40, num_datapoints=2000,
                         plot=True, error=['mse', 'mape'],
-                        rel_metrics=True):
+                        rel_metrics=True, opt=True):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -147,11 +161,39 @@ def balanced_prediction(filename, freq, targetcol, datecol,
     error_2 = metrics.switch_abs_error('mse', y_test, pred_2)
 
     if error_1 < error_2:
-        pred = pred_1
-        print('Used KNN Model')
+        print('Using KNN Prediction')
+        if opt:
+            print('Optimizing model')
+            regressor_1_o = prediction.KNN_Model_Opt
+            regressor_1_o.fit(X=X_train_selec,
+                              y=y_horizon.values.ravel())
+            pred_1_o = prediction.recursive_forecast(y=y_train,
+                                                     model=regressor_1_o,
+                                                     window_length=window_length,
+                                                     feature_names=best_features,
+                                                     rolling_window=rolling_window,
+                                                     n_steps=points,
+                                                     freq=freq)
+            pred = pred_1_o
+        else:
+            pred = pred_1
     else:
-        pred = pred_2
-        print('Used LightGBM Model')
+        print('Using LightGBM prediction')
+        if opt:
+            print('Optimizing model')
+            regressor_2_o = prediction.LGB_Model_Opt
+            regressor_2_o.fit(X=X_train_selec,
+                              y=y_horizon.values.ravel())
+            pred_2_o = prediction.recursive_forecast(y=y_train,
+                                                     model=regressor_2_o,
+                                                     window_length=window_length,
+                                                     feature_names=best_features,
+                                                     rolling_window=rolling_window,
+                                                     n_steps=points,
+                                                     freq=freq)
+            pred = pred_2_o
+        else:
+            pred = pred_2
 
     if plot:
         plotting.plot_test_pred(y_test, pred)
@@ -183,7 +225,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
                     features=['mean', 'std', 'max', 'min', 'minute'],
                     selected_feat=50, num_datapoints=2000,
                     plot=True, error=['mse', 'mape'],
-                    rel_metrics=True):
+                    rel_metrics=True, opt=True):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -258,11 +300,39 @@ def slow_prediction(filename, freq, targetcol, datecol,
         pred = pred_3
         print('Using LSTM prediction')
     elif(error_2 < error_1) & (error_2 < error_3):
-        pred = pred_2
         print('Using LightGBM prediction')
+        if opt:
+            print('Optimizing model')
+            regressor_2_o = prediction.LGB_Model_Opt
+            regressor_2_o.fit(X=X_train_selec,
+                              y=y_horizon.values.ravel())
+            pred_2_o = prediction.recursive_forecast(y=y_train,
+                                                     model=regressor_2_o,
+                                                     window_length=window_length,
+                                                     feature_names=best_features,
+                                                     rolling_window=rolling_window,
+                                                     n_steps=points,
+                                                     freq=freq)
+            pred = pred_2_o
+        else:
+            pred = pred_2
     else:
-        pred = pred_1
         print('Using KNN Prediction')
+        if opt:
+            print('Optimizing model')
+            regressor_1_o = prediction.KNN_Model_Opt
+            regressor_1_o.fit(X=X_train_selec,
+                              y=y_horizon.values.ravel())
+            pred_1_o = prediction.recursive_forecast(y=y_train,
+                                                     model=regressor_1_o,
+                                                     window_length=window_length,
+                                                     feature_names=best_features,
+                                                     rolling_window=rolling_window,
+                                                     n_steps=points,
+                                                     freq=freq)
+            pred = pred_1_o
+        else:
+            pred = pred_1
 
     if plot:
         plotting.plot_test_pred(y_test, pred)
