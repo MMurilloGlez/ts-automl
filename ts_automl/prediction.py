@@ -122,18 +122,20 @@ LGB_Model = LGBMRegressor(n_jobs=-1)
 
 def KNN_Model_Opt(time_left=None, knn_reg_params=knn_reg_params):
     return(HE(regressor=knn_reg('knnopt', **knn_reg_params),
-                      algo=tpe.suggest,
-                      max_evals=50,
-                      n_jobs=-1,
-                      trial_timeout=time_left))
+              algo=tpe.suggest,
+              max_evals=50,
+              n_jobs=-1,
+              trial_timeout=time_left))
 
 
 def LGB_Model_Opt(time_left=None, lgb_reg_params=lgb_reg_params):
     return(HE(regressor=lgb_reg('lgbmopt', **lgb_reg_params),
-                      algo=tpe.suggest,
-                      max_evals=50,
-                      n_jobs=-1,
-                      trial_timeout=time_left))
+              algo=tpe.suggest,
+              max_evals=50,
+              n_jobs=-1,
+              trial_timeout=time_left))
+
+
 scaler = MinMaxScaler(feature_range=(0, 1))
 
 
