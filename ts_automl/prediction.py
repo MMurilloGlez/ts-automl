@@ -57,28 +57,6 @@ def LSTM_Model_gen(n_feat):
     return(model1)
 
 
-def Mixed_Model_gen(n_feat):
-    """
-    Mixed recurrent neural net model construcion for forecasting with keras
-
-    Consists of a Time Convolutional Network (TCN) layer with droput rate of
-    0.3 and batch normalization, followed by an LSTM layer with 256 neurons.
-    Both have relu activation function. Last layer consists of one single
-    neuron also without activation function.
-
-    """
-    model2 = Sequential()
-    model2.add(TCN(input_shape=(1, n_feat),  return_sequences=True,
-                   use_batch_norm=True, activation='relu', padding='causal',
-                   dropout_rate=0.3))
-    model2.add(LSTM(256, activation='relu', return_sequences=True))
-    model2.add(Dense(1))
-
-    model2.compile(loss='mape', optimizer='adam',
-                   metrics=MeanAbsolutePercentageError())
-    return(model2)
-
-
 def TCN_Model_gen(n_feat):
     """
     Time convolutional neural net model construction for forecasting with keras
@@ -113,12 +91,6 @@ def TCN_Model(n_feat):
                           epochs=100)
 
 
-def Mixed_Model(n_feat):
-    return KerasRegressor(build_fn=(lambda: Mixed_Model_gen(n_feat)),
-                          verbose=1,  batch_size=16,
-                          epochs=10)
-
-
 def GLM_Model():
     return(lambda: sm.GLM(family=sm.families.Gamma()))
 
@@ -140,20 +112,28 @@ lgb_reg_params = {
 knn_reg_params = {
     'n_neighbors': hp.choice('n_neighbors', np.arange(5, 50, 5)),
     'weights': hp.choice('weights', ['uniform', 'distance']),
-    'leaf_size': hp.choice('leaf_size', np.arange(30, 60, 10)),
-    'n_jobs': hp.choice('n_jobs', [-1])
-
+    'leaf_size': hp.choice('leaf_size', np.arange(30, 60, 10))
     }
 
 Naive_Model = NaiveForecaster
 KNN_Model = KNeighborsRegressor(n_jobs=-1)
 LGB_Model = LGBMRegressor(n_jobs=-1)
-KNN_Model_Opt = HE(regressor=knn_reg('knnopt', **knn_reg_params),
-                   algo=tpe.suggest,
-                   max_evals=5)
-LGB_Model_Opt = HE(regressor=lgb_reg('lgbmopt', **lgb_reg_params),
-                   algo=tpe.suggest,
-                   max_evals=5)
+
+
+def KNN_Model_Opt(time_left=None, knn_reg_params=knn_reg_params):
+    return(HE(regressor=knn_reg('knnopt', **knn_reg_params),
+                      algo=tpe.suggest,
+                      max_evals=50,
+                      n_jobs=-1,
+                      trial_timeout=time_left))
+
+
+def LGB_Model_Opt(time_left=None, lgb_reg_params=lgb_reg_params):
+    return(HE(regressor=lgb_reg('lgbmopt', **lgb_reg_params),
+                      algo=tpe.suggest,
+                      max_evals=50,
+                      n_jobs=-1,
+                      trial_timeout=time_left))
 scaler = MinMaxScaler(feature_range=(0, 1))
 
 

@@ -7,6 +7,7 @@ each sacrificing processing time for forecasting accuracy.
 
 """
 import numpy as np
+from time import perf_counter
 
 from ts_automl import data_input
 from ts_automl import preprocessing
@@ -21,7 +22,9 @@ def fast_prediction(filename, freq, targetcol, datecol,
                     horizon=1, step=1, num_datapoints=2000,
                     features=['mean', 'std', 'max', 'min', 'minute'],
                     selected_feat=20, plot=True, error=['mse', 'mape'],
-                    rel_metrics=True, opt=False):
+                    rel_metrics=True, opt=True, time=30):
+
+    t0 = perf_counter()
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -60,10 +63,10 @@ def fast_prediction(filename, freq, targetcol, datecol,
                                          rolling_window=rolling_window,
                                          n_steps=points,
                                          freq=freq)
+    time_left = time - (perf_counter()-t0)
+    if opt & (time_left > 0):
 
-    if opt:
-
-        regressor_1_o = prediction.KNN_Model_Opt
+        regressor_1_o = prediction.KNN_Model_Opt(time_left=time_left)
         regressor_1_o.fit(X=X_train_selec,
                           y=y_horizon.values.ravel())
         pred_1_o = prediction.recursive_forecast(y=y_train,
@@ -105,8 +108,8 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                         features=['mean', 'std', 'max', 'min', 'minute'],
                         selected_feat=40, num_datapoints=2000,
                         plot=True, error=['mse', 'mape'],
-                        rel_metrics=True, opt=True):
-
+                        rel_metrics=True, opt=True, time=120):
+    t0 = perf_counter()
     df = data_input.read_data(filename=filename,
                               freq=freq,
                               targetcol=targetcol,
@@ -159,12 +162,12 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                                            freq=freq)
 
     error_2 = metrics.switch_abs_error('mse', y_test, pred_2)
-
+    time_left = time - (perf_counter()-t0)
     if error_1 < error_2:
         print('Using KNN Prediction')
-        if opt:
+        if opt & (time_left > 0):
             print('Optimizing model')
-            regressor_1_o = prediction.KNN_Model_Opt
+            regressor_1_o = prediction.KNN_Model_Opt(time_left=time_left)
             regressor_1_o.fit(X=X_train_selec,
                               y=y_horizon.values.ravel())
             pred_1_o = prediction.recursive_forecast(y=y_train,
@@ -179,9 +182,9 @@ def balanced_prediction(filename, freq, targetcol, datecol,
             pred = pred_1
     else:
         print('Using LightGBM prediction')
-        if opt:
+        if opt & (time_left > 0):
             print('Optimizing model')
-            regressor_2_o = prediction.LGB_Model_Opt
+            regressor_2_o = prediction.LGB_Model_Opt(time_left=time_left)
             regressor_2_o.fit(X=X_train_selec,
                               y=y_horizon.values.ravel())
             pred_2_o = prediction.recursive_forecast(y=y_train,
