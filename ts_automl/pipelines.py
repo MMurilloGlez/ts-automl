@@ -108,7 +108,7 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                         features=['mean', 'std', 'max', 'min', 'minute'],
                         selected_feat=40, num_datapoints=2000,
                         plot=True, error=['mse', 'mape'],
-                        rel_metrics=True, opt=True, time=120):
+                        rel_metrics=True, opt=False, time=120):
     t0 = perf_counter()
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -228,7 +228,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
                     features=['mean', 'std', 'max', 'min', 'minute'],
                     selected_feat=50, num_datapoints=2000,
                     plot=True, error=['mse', 'mape'],
-                    rel_metrics=True, opt=True, time = 240):
+                    rel_metrics=True, opt=False, time = 240):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,

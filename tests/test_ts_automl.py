@@ -78,16 +78,16 @@ def test_fast_4():
     assert r < 100
 
 
-def test_fast_5():
-    """Test for fast prediction time, using knn, series 5"""
-    p, e, r = fast_prediction(filename='./tests/test_series/Serie5.csv',
-                              freq='20T',
-                              targetcol='VALUE',
-                              datecol='DATE',
-                              sep=';',
-                              decimal=',',
-                              date_format="%d/%m/%Y %H:%M:%S.%f",
-                              plot=False)
+# def test_fast_5():
+#     """Test for fast prediction time, using knn, series 5"""
+#     p, e, r = fast_prediction(filename='./tests/test_series/Serie5.csv',
+#                               freq='20T',
+#                               targetcol='VALUE',
+#                               datecol='DATE',
+#                               sep=';',
+#                               decimal=',',
+#                               date_format="%d/%m/%Y %H:%M:%S.%f",
+#                               plot=False)
 
 
 def test_bal_1():
@@ -145,18 +145,18 @@ def test_bal_4():
     assert r < 100
 
 
-def test_bal_5():
-    """Test for balanced prediction time, using lightgbm, series 5"""
-    p, e, r = balanced_prediction(filename='./tests/test_series/Serie5.csv',
-                                  freq='20T',
-                                  targetcol='VALUE',
-                                  datecol='DATE',
-                                  sep=';',
-                                  decimal=',',
-                                  date_format="%d/%m/%Y %H:%M:%S.%f",
-                                  plot=False)
+# def test_bal_5():
+#     """Test for balanced prediction time, using lightgbm, series 5"""
+#     p, e, r = balanced_prediction(filename='./tests/test_series/Serie5.csv',
+#                                   freq='20T',
+#                                   targetcol='VALUE',
+#                                   datecol='DATE',
+#                                   sep=';',
+#                                   decimal=',',
+#                                   date_format="%d/%m/%Y %H:%M:%S.%f",
+#                                   plot=False)
 
-    assert r < 100
+#     assert r < 100
 
 
 def test_slow_1():
@@ -215,13 +215,13 @@ def test_slow_4():
     assert r < 100
 
 
-def test_slow_5():
-    """Test for slow prediction time, using keras, series 5"""
-    p, e, r = slow_prediction(filename='./tests/test_series/Serie5.csv',
-                              freq='20T',
-                              targetcol='VALUE',
-                              datecol='DATE',
-                              sep=';',
-                              decimal=',',
-                              date_format="%d/%m/%Y %H:%M:%S.%f",
-                              plot=False)
+# def test_slow_5():
+#     """Test for slow prediction time, using keras, series 5"""
+#     p, e, r = slow_prediction(filename='./tests/test_series/Serie5.csv',
+#                               freq='20T',
+#                               targetcol='VALUE',
+#                               datecol='DATE',
+#                               sep=';',
+#                               decimal=',',
+#                               date_format="%d/%m/%Y %H:%M:%S.%f",
+#                               plot=False)

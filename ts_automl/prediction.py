@@ -123,14 +123,14 @@ LGB_Model = LGBMRegressor(n_jobs=-1)
 def KNN_Model_Opt(time_left=None, knn_reg_params=knn_reg_params):
     return(HE(regressor=knn_reg('knnopt', **knn_reg_params),
               algo=tpe.suggest,
-              max_evals=time_left//6,
+              max_evals=abs(time_left)//6,
               n_jobs=-1))
 
 
 def LGB_Model_Opt(time_left=None, lgb_reg_params=lgb_reg_params):
     return(HE(regressor=lgb_reg('lgbmopt', **lgb_reg_params),
               algo=tpe.suggest,
-              max_evals=time_left//6,
+              max_evals=abs(time_left)//10,
               n_jobs=-1))
 
 
