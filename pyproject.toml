@@ -9,8 +9,9 @@ repository = "https://gitlab.corp.cic.es/CIC/IDbox/idbox-ml-i-d/ts-automl"
 
 [tool.poetry.dependencies]
 python = "^3.8"
+tensorflow = "2.4.1"
+keras = "2.4.3"
 keras-tcn = "^3.4.0"
-keras = "^2.4.3"
 pandas = "^1.2.4"
 plotly = "^4.14.3"
 skits = "^0.1.2"
@@ -19,7 +20,7 @@ statsmodels = "^0.12.2"
 sktime = "^0.6.0"
 hpsklearn = {git = "https://github.com/hyperopt/hyperopt-sklearn"}
 scikit-learn = "^0.24.2"
-tensorflow = "2.4.1"
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
