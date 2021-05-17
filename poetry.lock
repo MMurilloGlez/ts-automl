@@ -685,17 +685,6 @@ numpy = "*"
 scikit-learn = "*"
 
 [[package]]
-name = "sklearn"
-version = "0.0"
-description = "A set of python modules for machine learning and data mining"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-scikit-learn = "*"
-
-[[package]]
 name = "sktime"
 version = "0.6.0"
 description = "A unified Python toolbox for machine learning with time series"
@@ -913,7 +902,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "272b1ae9bf8ca052ddefc51fd70a56ddbdde1f67006b147de480593833101d79"
+content-hash = "42532dfac3e420b06d8392c82f4ea50087513f77f8a7989d50c0764d2a3b0e7a"
 
 [metadata.files]
 absl-py = [
@@ -1396,9 +1385,6 @@ six = [
 skits = [
     {file = "skits-0.1.2-py3-none-any.whl", hash = "sha256:1b0d1d527a8ceda2f921ab62a5d194e2b0748fc36f82e29e9695f0d2a8167028"},
     {file = "skits-0.1.2.tar.gz", hash = "sha256:df5d183c1520c1debb36096a7d46f5e62266c45c372419f7429f95d6245a3b8b"},
-]
-sklearn = [
-    {file = "sklearn-0.0.tar.gz", hash = "sha256:e23001573aa194b834122d2b9562459bf5ae494a2d59ca6b8aa22c85a44c0e31"},
 ]
 sktime = [
     {file = "sktime-0.6.0-cp36-cp36m-macosx_10_15_x86_64.whl", hash = "sha256:41ca24269dba7e37900bc18801e1906c63cf7bf23cedfeaa404e6e86fc9cfb18"},

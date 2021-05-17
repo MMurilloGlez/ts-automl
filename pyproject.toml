@@ -19,7 +19,7 @@ statsmodels = "^0.12.2"
 sktime = "^0.6.0"
 hpsklearn = {git = "https://github.com/hyperopt/hyperopt-sklearn"}
 scikit-learn = "^0.24.2"
-sklearn = "^0.0"
+tensorflow = "2.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
