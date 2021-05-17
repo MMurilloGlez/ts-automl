@@ -123,17 +123,15 @@ LGB_Model = LGBMRegressor(n_jobs=-1)
 def KNN_Model_Opt(time_left=None, knn_reg_params=knn_reg_params):
     return(HE(regressor=knn_reg('knnopt', **knn_reg_params),
               algo=tpe.suggest,
-              max_evals=50,
-              n_jobs=-1,
-              trial_timeout=time_left))
+              max_evals=time_left//6,
+              n_jobs=-1))
 
 
 def LGB_Model_Opt(time_left=None, lgb_reg_params=lgb_reg_params):
     return(HE(regressor=lgb_reg('lgbmopt', **lgb_reg_params),
               algo=tpe.suggest,
-              max_evals=50,
-              n_jobs=-1,
-              trial_timeout=time_left))
+              max_evals=time_left//6,
+              n_jobs=-1))
 
 
 scaler = MinMaxScaler(feature_range=(0, 1))
@@ -599,8 +597,8 @@ def create_features(feature_names, lags_data, date):
     return features
 
 
-def recursive_forecast(y, model, window_length, feature_names, rolling_window,
-                       n_steps, freq):
+def rec_forecast(y, model, window_length, feature_names, rolling_window,
+                 n_steps, freq):
     """
     Forecasting function which applies a given model recursively in a series
 
@@ -643,8 +641,8 @@ def recursive_forecast(y, model, window_length, feature_names, rolling_window,
     return target_value
 
 
-def recursive_forecast_np(y, model, window_length, feature_names,
-                          rolling_window, n_steps, freq):
+def rec_forecast_np(y, model, window_length, feature_names,
+                    rolling_window, n_steps, freq):
     """
     Recursive forecast function using numpy arrays
 

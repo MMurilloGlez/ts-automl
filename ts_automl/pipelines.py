@@ -35,10 +35,10 @@ def fast_prediction(filename, freq, targetcol, datecol,
                               date_format=date_format)
 
     y_train, y_test = preprocessing.ts_split(df, test_size=points)
-    X_train = preprocessing.create_sample_features(y_train,
-                                                   window_length=window_length,
-                                                   features=features,
-                                                   rolling_window=rolling_window)
+    X_train = preprocessing.create_sample_feat(y_train,
+                                               window_length=window_length,
+                                               features=features,
+                                               rolling_window=rolling_window)
 
     X_train = X_train.loc[:, ~X_train.columns.duplicated()]
     X_train = X_train.iloc[-num_datapoints:, :]
@@ -56,26 +56,26 @@ def fast_prediction(filename, freq, targetcol, datecol,
     regressor.fit(X=X_train_selec,
                   y=y_horizon.values.ravel())
 
-    pred = prediction.recursive_forecast(y=y_train,
-                                         model=regressor,
-                                         window_length=window_length,
-                                         feature_names=best_features,
-                                         rolling_window=rolling_window,
-                                         n_steps=points,
-                                         freq=freq)
+    pred = prediction.rec_forecast(y=y_train,
+                                   model=regressor,
+                                   window_length=window_length,
+                                   feature_names=best_features,
+                                   rolling_window=rolling_window,
+                                   n_steps=points,
+                                   freq=freq)
     time_left = time - (perf_counter()-t0)
     if opt & (time_left > 0):
 
         regressor_1_o = prediction.KNN_Model_Opt(time_left=time_left)
         regressor_1_o.fit(X=X_train_selec,
                           y=y_horizon.values.ravel())
-        pred_1_o = prediction.recursive_forecast(y=y_train,
-                                                 model=regressor_1_o,
-                                                 window_length=window_length,
-                                                 feature_names=best_features,
-                                                 rolling_window=rolling_window,
-                                                 n_steps=points,
-                                                 freq=freq)
+        pred_1_o = prediction.rec_forecast(y=y_train,
+                                           model=regressor_1_o,
+                                           window_length=window_length,
+                                           feature_names=best_features,
+                                           rolling_window=rolling_window,
+                                           n_steps=points,
+                                           freq=freq)
         pred = pred_1_o
 
     if plot:
@@ -119,10 +119,10 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                               date_format=date_format)
 
     y_train, y_test = preprocessing.ts_split(df, test_size=points)
-    X_train = preprocessing.create_sample_features(y_train,
-                                                   window_length=window_length,
-                                                   features=features,
-                                                   rolling_window=rolling_window)
+    X_train = preprocessing.create_sample_feat(y_train,
+                                               window_length=window_length,
+                                               features=features,
+                                               rolling_window=rolling_window)
 
     X_train = X_train.loc[:, ~X_train.columns.duplicated()]
 
@@ -139,13 +139,13 @@ def balanced_prediction(filename, freq, targetcol, datecol,
     regressor_1.fit(X=X_train_selec,
                     y=y_horizon.values.ravel())
 
-    pred_1 = prediction.recursive_forecast(y=y_train,
-                                           model=regressor_1,
-                                           window_length=window_length,
-                                           feature_names=best_features,
-                                           rolling_window=rolling_window,
-                                           n_steps=points,
-                                           freq=freq)
+    pred_1 = prediction.rec_forecast(y=y_train,
+                                     model=regressor_1,
+                                     window_length=window_length,
+                                     feature_names=best_features,
+                                     rolling_window=rolling_window,
+                                     n_steps=points,
+                                     freq=freq)
 
     error_1 = metrics.switch_abs_error('mse', y_test, pred_1)
 
@@ -153,13 +153,13 @@ def balanced_prediction(filename, freq, targetcol, datecol,
     regressor_2.fit(X=X_train_selec,
                     y=y_horizon.values.ravel())
 
-    pred_2 = prediction.recursive_forecast(y=y_train,
-                                           model=regressor_2,
-                                           window_length=window_length,
-                                           feature_names=best_features,
-                                           rolling_window=rolling_window,
-                                           n_steps=points,
-                                           freq=freq)
+    pred_2 = prediction.rec_forecast(y=y_train,
+                                     model=regressor_2,
+                                     window_length=window_length,
+                                     feature_names=best_features,
+                                     rolling_window=rolling_window,
+                                     n_steps=points,
+                                     freq=freq)
 
     error_2 = metrics.switch_abs_error('mse', y_test, pred_2)
     time_left = time - (perf_counter()-t0)
@@ -170,13 +170,13 @@ def balanced_prediction(filename, freq, targetcol, datecol,
             regressor_1_o = prediction.KNN_Model_Opt(time_left=time_left)
             regressor_1_o.fit(X=X_train_selec,
                               y=y_horizon.values.ravel())
-            pred_1_o = prediction.recursive_forecast(y=y_train,
-                                                     model=regressor_1_o,
-                                                     window_length=window_length,
-                                                     feature_names=best_features,
-                                                     rolling_window=rolling_window,
-                                                     n_steps=points,
-                                                     freq=freq)
+            pred_1_o = prediction.rec_forecast(y=y_train,
+                                               model=regressor_1_o,
+                                               window_length=window_length,
+                                               feature_names=best_features,
+                                               rolling_window=rolling_window,
+                                               n_steps=points,
+                                               freq=freq)
             pred = pred_1_o
         else:
             pred = pred_1
@@ -187,13 +187,13 @@ def balanced_prediction(filename, freq, targetcol, datecol,
             regressor_2_o = prediction.LGB_Model_Opt(time_left=time_left)
             regressor_2_o.fit(X=X_train_selec,
                               y=y_horizon.values.ravel())
-            pred_2_o = prediction.recursive_forecast(y=y_train,
-                                                     model=regressor_2_o,
-                                                     window_length=window_length,
-                                                     feature_names=best_features,
-                                                     rolling_window=rolling_window,
-                                                     n_steps=points,
-                                                     freq=freq)
+            pred_2_o = prediction.rec_forecast(y=y_train,
+                                               model=regressor_2_o,
+                                               window_length=window_length,
+                                               feature_names=best_features,
+                                               rolling_window=rolling_window,
+                                               n_steps=points,
+                                               freq=freq)
             pred = pred_2_o
         else:
             pred = pred_2
@@ -241,10 +241,10 @@ def slow_prediction(filename, freq, targetcol, datecol,
     y_train, y_test = preprocessing.ts_split(df, test_size=points)
     y_train = y_train.iloc[-num_datapoints:, :]
 
-    X_train = preprocessing.create_sample_features(y_train,
-                                                   window_length=window_length,
-                                                   features=features,
-                                                   rolling_window=rolling_window)
+    X_train = preprocessing.create_sample_feat(y_train,
+                                               window_length=window_length,
+                                               features=features,
+                                               rolling_window=rolling_window)
 
     X_train = X_train.loc[:, ~X_train.columns.duplicated()]
 
@@ -261,13 +261,13 @@ def slow_prediction(filename, freq, targetcol, datecol,
     regressor_1.fit(X=X_train_selec,
                     y=y_horizon.values.ravel())
 
-    pred_1 = prediction.recursive_forecast(y=y_train,
-                                           model=regressor_1,
-                                           window_length=window_length,
-                                           feature_names=best_features,
-                                           rolling_window=rolling_window,
-                                           n_steps=points,
-                                           freq=freq)
+    pred_1 = prediction.rec_forecast(y=y_train,
+                                     model=regressor_1,
+                                     window_length=window_length,
+                                     feature_names=best_features,
+                                     rolling_window=rolling_window,
+                                     n_steps=points,
+                                     freq=freq)
 
     error_1 = metrics.switch_abs_error('mse', y_test, pred_1)
 
@@ -275,13 +275,13 @@ def slow_prediction(filename, freq, targetcol, datecol,
     regressor_2.fit(X=X_train_selec,
                     y=y_horizon.values.ravel())
 
-    pred_2 = prediction.recursive_forecast(y=y_train,
-                                           model=regressor_2,
-                                           window_length=window_length,
-                                           feature_names=best_features,
-                                           rolling_window=rolling_window,
-                                           n_steps=points,
-                                           freq=freq)
+    pred_2 = prediction.rec_forecast(y=y_train,
+                                     model=regressor_2,
+                                     window_length=window_length,
+                                     feature_names=best_features,
+                                     rolling_window=rolling_window,
+                                     n_steps=points,
+                                     freq=freq)
 
     error_2 = metrics.switch_abs_error('mse', y_test, pred_2)
 
@@ -289,13 +289,13 @@ def slow_prediction(filename, freq, targetcol, datecol,
     regressor_3.fit(x=X_train_selec.to_numpy().reshape(-1, 1, selected_feat),
                     y=y_horizon.values.ravel())
 
-    pred_3 = prediction.recursive_forecast_np(y=y_train,
-                                              model=regressor_3,
-                                              window_length=window_length,
-                                              feature_names=best_features,
-                                              rolling_window=rolling_window,
-                                              n_steps=points,
-                                              freq=freq)
+    pred_3 = prediction.rec_forecast_np(y=y_train,
+                                        model=regressor_3,
+                                        window_length=window_length,
+                                        feature_names=best_features,
+                                        rolling_window=rolling_window,
+                                        n_steps=points,
+                                        freq=freq)
 
     error_3 = metrics.switch_abs_error('mse', y_test, pred_3)
 
@@ -306,16 +306,16 @@ def slow_prediction(filename, freq, targetcol, datecol,
         print('Using LightGBM prediction')
         if opt:
             print('Optimizing model')
-            regressor_2_o = prediction.LGB_Model_Opt
+            regressor_2_o = prediction.LGB_Model_Opt(time_left=300)
             regressor_2_o.fit(X=X_train_selec,
                               y=y_horizon.values.ravel())
-            pred_2_o = prediction.recursive_forecast(y=y_train,
-                                                     model=regressor_2_o,
-                                                     window_length=window_length,
-                                                     feature_names=best_features,
-                                                     rolling_window=rolling_window,
-                                                     n_steps=points,
-                                                     freq=freq)
+            pred_2_o = prediction.rec_forecast(y=y_train,
+                                               model=regressor_2_o,
+                                               window_length=window_length,
+                                               feature_names=best_features,
+                                               rolling_window=rolling_window,
+                                               n_steps=points,
+                                               freq=freq)
             pred = pred_2_o
         else:
             pred = pred_2
@@ -323,16 +323,16 @@ def slow_prediction(filename, freq, targetcol, datecol,
         print('Using KNN Prediction')
         if opt:
             print('Optimizing model')
-            regressor_1_o = prediction.KNN_Model_Opt
+            regressor_1_o = prediction.KNN_Model_Opt(time_left=300)
             regressor_1_o.fit(X=X_train_selec,
                               y=y_horizon.values.ravel())
-            pred_1_o = prediction.recursive_forecast(y=y_train,
-                                                     model=regressor_1_o,
-                                                     window_length=window_length,
-                                                     feature_names=best_features,
-                                                     rolling_window=rolling_window,
-                                                     n_steps=points,
-                                                     freq=freq)
+            pred_1_o = prediction.rec_forecast(y=y_train,
+                                               model=regressor_1_o,
+                                               window_length=window_length,
+                                               feature_names=best_features,
+                                               rolling_window=rolling_window,
+                                               n_steps=points,
+                                               freq=freq)
             pred = pred_1_o
         else:
             pred = pred_1

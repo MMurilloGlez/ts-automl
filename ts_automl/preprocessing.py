@@ -85,8 +85,8 @@ class Lags(TransformerMixin):
         if type(X) is pd.DataFrame:
             new_dict = {}
             for col_name in X:
-                for l in range(1, self.lag+1, self.step):
-                    new_dict['%s_lag%d' %(col_name, l)] = X[col_name].shift(l)
+                for n in range(1, self.lag+1, self.step):
+                    new_dict['%s_lag%d' %(col_name, n)] = X[col_name].shift(n)
             res = pd.DataFrame(new_dict, index=X.index)
 
         elif type(X) is pd.Series:
@@ -253,8 +253,8 @@ def iqr_sample(series, rolling_window=2):
 # -----------------------------------------------------------------------------
 
 
-def create_sample_features(X, window_length=5, features=[],
-                           rolling_window=[2]):
+def create_sample_feat(X, window_length=5, features=[],
+                       rolling_window=[2]):
     lags_X = lags_sample(X, window_length=window_length, step=1)
     df = lags_X.copy()
     for f in features:
