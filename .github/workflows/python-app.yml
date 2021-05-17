@@ -24,7 +24,7 @@ jobs:
       run: |
         tree -a -f
         python -m pip install --upgrade pip
-        pip install flake8 pytest pytest-cov
+        pip install flake8 pytest pytest-cov tensorflow==2.4.1 wheel
         pip install "./dist/ts_automl-0.1.2-py3-none-any.whl"
     - name: Lint with flake8
       run: |
