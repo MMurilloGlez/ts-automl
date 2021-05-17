@@ -22,7 +22,7 @@ def fast_prediction(filename, freq, targetcol, datecol,
                     horizon=1, step=1, num_datapoints=2000,
                     features=['mean', 'std', 'max', 'min', 'minute'],
                     selected_feat=20, plot=True, error=['mse', 'mape'],
-                    rel_metrics=True, opt=True, time=30):
+                    rel_metrics=True, opt=False, time=30):
 
     t0 = perf_counter()
 
@@ -228,7 +228,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
                     features=['mean', 'std', 'max', 'min', 'minute'],
                     selected_feat=50, num_datapoints=2000,
                     plot=True, error=['mse', 'mape'],
-                    rel_metrics=True, opt=True):
+                    rel_metrics=True, opt=True, time = 240):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -306,7 +306,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
         print('Using LightGBM prediction')
         if opt:
             print('Optimizing model')
-            regressor_2_o = prediction.LGB_Model_Opt(time_left=300)
+            regressor_2_o = prediction.LGB_Model_Opt(time_left=time)
             regressor_2_o.fit(X=X_train_selec,
                               y=y_horizon.values.ravel())
             pred_2_o = prediction.rec_forecast(y=y_train,
@@ -323,7 +323,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
         print('Using KNN Prediction')
         if opt:
             print('Optimizing model')
-            regressor_1_o = prediction.KNN_Model_Opt(time_left=300)
+            regressor_1_o = prediction.KNN_Model_Opt(time_left=time)
             regressor_1_o.fit(X=X_train_selec,
                               y=y_horizon.values.ravel())
             pred_1_o = prediction.rec_forecast(y=y_train,
