@@ -105,7 +105,7 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                         features=['mean', 'std', 'max', 'min', 'minute'],
                         selected_feat=40, num_datapoints=2000,
                         plot=True, error=['mse', 'mape'],
-                        rel_metrics=True, opt=False, opt_runs=20):
+                        rel_metrics=True, opt=False, opt_runs=10):
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
