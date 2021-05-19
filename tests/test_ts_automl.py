@@ -102,7 +102,8 @@ def test_bal_2():
                                   decimal=',',
                                   date_format="%d/%m/%Y %H:%M:%S.%f",
                                   plot=False,
-                                  opt=True)
+                                  opt=True,
+                                  opt_runs=10)
 
     assert r < 100
 
