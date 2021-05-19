@@ -120,17 +120,18 @@ KNN_Model = KNeighborsRegressor(n_jobs=-1)
 LGB_Model = LGBMRegressor(n_jobs=-1)
 
 
-def KNN_Model_Opt(time_left=None, knn_reg_params=knn_reg_params):
+def KNN_Model_Opt(opt_runs=10, knn_reg_params=knn_reg_params):
     return(HE(regressor=knn_reg('knnopt', **knn_reg_params),
               algo=tpe.suggest,
-              max_evals=abs(time_left)//6,
+              max_evals=opt_runs,
               n_jobs=-1))
 
 
-def LGB_Model_Opt(time_left=None, lgb_reg_params=lgb_reg_params):
+def LGB_Model_Opt(opt_runs=10, lgb_reg_params=lgb_reg_params):
+
     return(HE(regressor=lgb_reg('lgbmopt', **lgb_reg_params),
               algo=tpe.suggest,
-              max_evals=abs(time_left)//10,
+              max_evals=opt_runs,
               n_jobs=-1))
 
 
