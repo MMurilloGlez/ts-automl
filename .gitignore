@@ -115,3 +115,6 @@ dmypy.json
 .pyre/
 ts_automl/optimization.py
 .vscode/settings.json
+tests/test_series/Serie5.csv
+ts_automl/train_data/Aguas_Conductividad_Caldera.csv
+ts/automl/vscode
