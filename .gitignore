@@ -119,5 +119,4 @@ tests/test_series/Serie5.csv
 ts_automl/train_data/Aguas_Conductividad_Caldera.csv
 ts_automl/.vscode
 ts_automl/train_data
-tests/test_series/Serie5.csv
 
