@@ -34,7 +34,7 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest -W ignore::DeprecationWarning --cov=./ --cov-report xml:coverage.xml
+        pytest -v -W ignore::DeprecationWarning --cov=./ --cov-report xml:coverage.xml
     - name: Codecov Report
       if: always()
       uses: codecov/codecov-action@v1
