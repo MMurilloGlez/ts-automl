@@ -206,10 +206,11 @@ six = "*"
 [[package]]
 name = "hpsklearn"
 version = "0.0.3"
-description = "Hyperparameter Optimization for sklearn"
+description = ""
 category = "main"
 optional = false
 python-versions = "*"
+develop = false
 
 [package.dependencies]
 hyperopt = "*"
@@ -220,6 +221,13 @@ scipy = "*"
 
 [package.extras]
 xgboost = ["xgboost (==0.6a2)"]
+lightgbm = ["lightgbm (==2.3.1)"]
+
+[package.source]
+type = "git"
+url = "https://github.com/hyperopt/hyperopt-sklearn"
+reference = "master"
+resolved_reference = "7f4925c9e3ba8cd076fe00ee3a90bb120eec32b1"
 
 [[package]]
 name = "hyperopt"
@@ -949,7 +957,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "ee9b303fa824c6f0515173aeabc70c03170f4fdd49034005e1232eae7a0d4a87"
+content-hash = "a0a372261ff3cb6fe1e2b21ccc1afb2a9fd4504eb5b79799d9696f10f66050fc"
 
 [metadata.files]
 absl-py = [
@@ -1092,9 +1100,7 @@ h5py = [
     {file = "h5py-2.10.0-cp38-cp38-win_amd64.whl", hash = "sha256:769e141512b54dee14ec76ed354fcacfc7d97fea5a7646b709f7400cf1838630"},
     {file = "h5py-2.10.0.tar.gz", hash = "sha256:84412798925dc870ffd7107f045d7659e60f5d46d1c70c700375248bf6bf512d"},
 ]
-hpsklearn = [
-    {file = "hpsklearn-0.0.3.tar.gz", hash = "sha256:e530ed3f985f4eb4fd84fe29a6aaf4e8af03b7ff0584a30f7438f252faeaac84"},
-]
+hpsklearn = []
 hyperopt = [
     {file = "hyperopt-0.2.5-py2.py3-none-any.whl", hash = "sha256:dc5c7cceaf33c125b727cf92709e70035d94dd507831dae66406ac762a18a253"},
     {file = "hyperopt-0.2.5.tar.gz", hash = "sha256:bc6047d50f956ae64eebcb34b1fd40f186a93e214957f20e87af2f10195295cc"},
