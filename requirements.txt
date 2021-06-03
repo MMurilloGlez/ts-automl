@@ -110,7 +110,8 @@ h5py==2.10.0 \
     --hash=sha256:6ef7ab1089e3ef53ca099038f3c0a94d03e3560e6aff0e9d6c64c55fb13fc681 \
     --hash=sha256:769e141512b54dee14ec76ed354fcacfc7d97fea5a7646b709f7400cf1838630 \
     --hash=sha256:84412798925dc870ffd7107f045d7659e60f5d46d1c70c700375248bf6bf512d
-hpsklearn @ git+https://github.com/hyperopt/hyperopt-sklearn@master
+hpsklearn==0.1.0 \
+    --hash=sha256:3a320062eb3296b35cccac87ad8b28b95dbc5f1fad22dc81e911f26d5b491cb7
 hyperopt==0.2.5 \
     --hash=sha256:dc5c7cceaf33c125b727cf92709e70035d94dd507831dae66406ac762a18a253 \
     --hash=sha256:bc6047d50f956ae64eebcb34b1fd40f186a93e214957f20e87af2f10195295cc
@@ -498,9 +499,9 @@ termcolor==1.1.0 \
 threadpoolctl==2.1.0; python_version >= "3.6" \
     --hash=sha256:38b74ca20ff3bb42caca8b00055111d74159ee95c4370882bbff2b93d24da725 \
     --hash=sha256:ddc57c96a38beb63db45d6c159b5ab07b6bced12c45a1f07b2b92f272aebfa6b
-tqdm==4.60.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" \
-    --hash=sha256:daec693491c52e9498632dfbe9ccfc4882a557f5fa08982db1b4d3adbe0887c3 \
-    --hash=sha256:ebdebdb95e3477ceea267decfc0784859aa3df3e27e22d23b83e9b272bf157ae
+tqdm==4.61.0; python_version >= "2.7" and python_full_version < "3.0.0" or python_full_version >= "3.4.0" \
+    --hash=sha256:736524215c690621b06fc89d0310a49822d75e599fcd0feb7cc742b98d692493 \
+    --hash=sha256:cd5791b5d7c3f2f1819efc81d36eb719a38e0906a7380365c556779f585ea042
 typeguard==2.12.0; python_full_version >= "3.5.3" \
     --hash=sha256:7d1cf82b35e9ff3cd083133ebda54ad1d7a40296471397e6c6b229cf07fe5307 \
     --hash=sha256:fca77fd4ccba63465b421cdbbab5a1a8e3994e6d6f18b45da2bb475c09f147ef

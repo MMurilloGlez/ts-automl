@@ -205,12 +205,11 @@ six = "*"
 
 [[package]]
 name = "hpsklearn"
-version = "0.0.3"
-description = ""
+version = "0.1.0"
+description = "Hyperparameter Optimization for sklearn"
 category = "main"
 optional = false
 python-versions = "*"
-develop = false
 
 [package.dependencies]
 hyperopt = "*"
@@ -221,13 +220,6 @@ scipy = "*"
 
 [package.extras]
 xgboost = ["xgboost (==0.6a2)"]
-lightgbm = ["lightgbm (==2.3.1)"]
-
-[package.source]
-type = "git"
-url = "https://github.com/hyperopt/hyperopt-sklearn"
-reference = "master"
-resolved_reference = "7f4925c9e3ba8cd076fe00ee3a90bb120eec32b1"
 
 [[package]]
 name = "hyperopt"
@@ -882,7 +874,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "tqdm"
-version = "4.60.0"
+version = "4.61.0"
 description = "Fast, Extensible Progress Meter"
 category = "main"
 optional = false
@@ -957,7 +949,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "a0a372261ff3cb6fe1e2b21ccc1afb2a9fd4504eb5b79799d9696f10f66050fc"
+content-hash = "8a343b50afd68f468e945765f3bab03cfc5c49b0a21eb87b8363575f2ecfd91b"
 
 [metadata.files]
 absl-py = [
@@ -1100,7 +1092,9 @@ h5py = [
     {file = "h5py-2.10.0-cp38-cp38-win_amd64.whl", hash = "sha256:769e141512b54dee14ec76ed354fcacfc7d97fea5a7646b709f7400cf1838630"},
     {file = "h5py-2.10.0.tar.gz", hash = "sha256:84412798925dc870ffd7107f045d7659e60f5d46d1c70c700375248bf6bf512d"},
 ]
-hpsklearn = []
+hpsklearn = [
+    {file = "hpsklearn-0.1.0.tar.gz", hash = "sha256:3a320062eb3296b35cccac87ad8b28b95dbc5f1fad22dc81e911f26d5b491cb7"},
+]
 hyperopt = [
     {file = "hyperopt-0.2.5-py2.py3-none-any.whl", hash = "sha256:dc5c7cceaf33c125b727cf92709e70035d94dd507831dae66406ac762a18a253"},
     {file = "hyperopt-0.2.5.tar.gz", hash = "sha256:bc6047d50f956ae64eebcb34b1fd40f186a93e214957f20e87af2f10195295cc"},
@@ -1558,8 +1552,8 @@ threadpoolctl = [
     {file = "threadpoolctl-2.1.0.tar.gz", hash = "sha256:ddc57c96a38beb63db45d6c159b5ab07b6bced12c45a1f07b2b92f272aebfa6b"},
 ]
 tqdm = [
-    {file = "tqdm-4.60.0-py2.py3-none-any.whl", hash = "sha256:daec693491c52e9498632dfbe9ccfc4882a557f5fa08982db1b4d3adbe0887c3"},
-    {file = "tqdm-4.60.0.tar.gz", hash = "sha256:ebdebdb95e3477ceea267decfc0784859aa3df3e27e22d23b83e9b272bf157ae"},
+    {file = "tqdm-4.61.0-py2.py3-none-any.whl", hash = "sha256:736524215c690621b06fc89d0310a49822d75e599fcd0feb7cc742b98d692493"},
+    {file = "tqdm-4.61.0.tar.gz", hash = "sha256:cd5791b5d7c3f2f1819efc81d36eb719a38e0906a7380365c556779f585ea042"},
 ]
 typeguard = [
     {file = "typeguard-2.12.0-py3-none-any.whl", hash = "sha256:7d1cf82b35e9ff3cd083133ebda54ad1d7a40296471397e6c6b229cf07fe5307"},
