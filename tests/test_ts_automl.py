@@ -39,7 +39,7 @@ def test_training():
         ('decimal', ','),
         ('points', '50'),
         ('window_length', '100'),
-        ('rolling_window', ['5','10','20']),
+        ('rolling_window', ['5', '10', '20']),
         ('horizon', '1'),
         ('step', '1'),
         ('num_datapoints', '2000'),
