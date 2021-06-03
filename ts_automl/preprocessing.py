@@ -9,10 +9,12 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.base import TransformerMixin
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from skits.preprocessing import HorizonTransformer
 import lightgbm as lgb
 import scipy
+
+scaler = MinMaxScaler(feature_range=(0, 1))
 
 
 def ts_split(data, test_size=100):
