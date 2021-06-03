@@ -69,7 +69,7 @@ def test_fit():
     response = client.get("/Fit/")
     assert response.status_code == 200
 
-Prediction tests
+# Prediction tests
 
 
 def test_fast_1():
