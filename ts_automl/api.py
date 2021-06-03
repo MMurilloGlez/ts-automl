@@ -1,5 +1,5 @@
 from typing import Optional, List
-from fastapi import FastAPI, UploadFile, File, Form, Query
+from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.encoders import jsonable_encoder
 from enum import Enum
 from ts_automl.data_input import read_data
@@ -54,26 +54,28 @@ def read_root():
 
 @app.post("/UploadTraining/")
 async def upload_csv(file: UploadFile = File(...),
-                     freq: str = Form('15T'),
-                     targetcol: str = Form('VALUE'),
-                     datecol: str = Form('DATE'),
-                     date_format: str = Form('%d/%m/%Y %H:%M:%S.%f'),
-                     sep: str = Form(';'),
-                     decimal: str = Form(','),
-                     points: int = Form(50),
-                     window_length: int = Form(100),
-                     rolling_window: List[int] = Form([10]),
-                     horizon: int = Form(1),
-                     step: int = Form(1),
-                     num_datapoints: int = Form(2000),
-                     features: List[Feat] = Query([Feat.mean, Feat.std]),
-                     selected_feat: int = Form(20),
-                     plot: Optional[bool] = Form(True),
-                     error: List[Errors] = Query([Errors.mse, Errors.mape]),
-                     rel_error: Optional[bool] = Form(True),
-                     opt: Optional[bool] = Form(False),
-                     opt_runs: Optional[int] = Form(10),
-                     fit_type: Pred_time = Form([Pred_time.fast])
+                     freq: Optional[str] = Query('15T'),
+                     targetcol: Optional[str] = Query('VALUE'),
+                     datecol: Optional[str] = Query('DATE'),
+                     dateformat: Optional[str] = Query('%d/%m/%Y %H:%M:%S.%f'),
+                     sep: Optional[str] = Query(';'),
+                     decimal: Optional[str] = Query(','),
+                     points: Optional[int] = Query(50),
+                     window_length: Optional[int] = Query(100),
+                     rolling_window: Optional[List[int]] = Query([10]),
+                     horizon: Optional[int] = Query(1),
+                     step: Optional[int] = Query(1),
+                     num_datapoints: Optional[int] = Query(2000),
+                     features: Optional[List[Feat]] = Query([Feat.mean,
+                                                             Feat.std]),
+                     selected_feat: Optional[int] = Query(20),
+                     plot: Optional[bool] = Query(True),
+                     error: Optional[List[Errors]] = Query([Errors.mse,
+                                                            Errors.mape]),
+                     rel_error: Optional[bool] = Query(True),
+                     opt: Optional[bool] = Query(False),
+                     opt_runs: Optional[int] = Query(10),
+                     fit_type: Optional[Pred_time] = Query([Pred_time.fast])
                      ):
     try:
         os.mkdir("./train_data")
@@ -90,7 +92,7 @@ async def upload_csv(file: UploadFile = File(...),
     response = {"filename": filename,
                 "datecol": datecol,
                 "targetcol": targetcol,
-                "date_format": date_format,
+                "dateformat": dateformat,
                 "sep": sep,
                 "decimal": decimal,
                 "freq": freq,
@@ -115,7 +117,7 @@ async def upload_csv(file: UploadFile = File(...),
                    datecol,
                    sep,
                    decimal,
-                   date_format,
+                   dateformat,
                    freq
                    )
     response['data'] = df.to_json()
@@ -141,13 +143,13 @@ async def model_fit():
         f = Namespace(**f)
         if f.fit_type == 'fast':
             fast_prediction(f.filename, f.freq, f.targetcol, f.datecol,
-                            f.sep, f.decimal, f.date_format)
+                            f.sep, f.decimal, f.dateformat)
         elif f.fit_type == 'balanced':
             balanced_prediction(f.filename, f.freq, f.targetcol, f.datecol,
-                                f.sep, f.decimal, f.date_format)
+                                f.sep, f.decimal, f.dateformat)
         else:
             slow_prediction(f.filename, f.freq, f.targetcol, f.datecol,
-                            f.sep, f.decimal, f.date_format)
+                            f.sep, f.decimal, f.dateformat)
         response = 'fit successful'
 
     return{response}
@@ -155,4 +157,5 @@ async def model_fit():
 
 @app.get('/Predict/')
 async def model_predict(horizon: int = Query(50)):
-    return{'jujuju'}
+
+    return{'This feature is not yet working'}

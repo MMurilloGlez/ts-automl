@@ -23,6 +23,9 @@ def fast_prediction(filename, freq, targetcol, datecol,
                     selected_feat=20, plot=True, error=['mse', 'mape'],
                     rel_metrics=True, opt=False, opt_runs=10):
 
+    if rel_metrics is not True:
+        r_error = None
+
     df = data_input.read_data(filename=filename,
                               freq=freq,
                               targetcol=targetcol,
@@ -60,7 +63,7 @@ def fast_prediction(filename, freq, targetcol, datecol,
                                    rolling_window=rolling_window,
                                    n_steps=points,
                                    freq=freq)
-
+    reg = regressor
     if opt:
 
         regressor_1_o = prediction.KNN_Model_Opt(opt_runs=opt_runs)
@@ -74,6 +77,7 @@ def fast_prediction(filename, freq, targetcol, datecol,
                                            n_steps=points,
                                            freq=freq)
         pred = pred_1_o
+        reg = regressor_1_o
 
     if plot:
         plotting.plot_test_pred(y_test, pred)
@@ -91,11 +95,19 @@ def fast_prediction(filename, freq, targetcol, datecol,
                                  sep=sep, decimal=decimal,
                                  date_format=date_format, points=points,
                                  num_datapoints=num_datapoints)
-        r_error = metrics.relative_error(y_test, pred, naive)
+        r_error = metrics.relative_error(y_test, pred, naive['pred'])
         print('error relative to naïve prediction')
         print(r_error)
-
-    return pred, abs_error, r_error
+    response = {'filename': filename,
+                'features': features,
+                'regressor': reg,
+                'r_error': r_error,
+                'abs_error': abs_error,
+                'error': error,
+                'pred': pred,
+                'y_true': y_test
+                }
+    return response
 
 
 def balanced_prediction(filename, freq, targetcol, datecol,
@@ -106,6 +118,9 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                         selected_feat=40, num_datapoints=2000,
                         plot=True, error=['mse', 'mape'],
                         rel_metrics=True, opt=False, opt_runs=10):
+
+    if rel_metrics is not True:
+        r_error = None
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -175,8 +190,10 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                                                n_steps=points,
                                                freq=freq)
             pred = pred_1_o
+            reg = regressor_1_o
         else:
             pred = pred_1
+            reg = regressor_1
     else:
         print('Using LightGBM prediction')
         if opt:
@@ -192,8 +209,10 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                                                n_steps=points,
                                                freq=freq)
             pred = pred_2_o
+            reg = regressor_2_o
         else:
             pred = pred_2
+            reg = regressor_2
 
     if plot:
         plotting.plot_test_pred(y_test, pred)
@@ -211,11 +230,20 @@ def balanced_prediction(filename, freq, targetcol, datecol,
                                  sep=sep, decimal=decimal,
                                  date_format=date_format, points=points,
                                  num_datapoints=num_datapoints)
-        r_error = metrics.relative_error(y_test, pred, naive)
+        r_error = metrics.relative_error(y_test, pred, naive['pred'])
         print('error relative to naïve prediction')
         print(r_error)
 
-    return pred,  abs_error, r_error
+    response = {'filename': filename,
+                'features': features,
+                'regressor': reg,
+                'r_error': r_error,
+                'abs_error': abs_error,
+                'error': error,
+                'pred': pred,
+                'y_test': y_test
+                }
+    return response
 
 
 def slow_prediction(filename, freq, targetcol, datecol,
@@ -226,6 +254,9 @@ def slow_prediction(filename, freq, targetcol, datecol,
                     selected_feat=50, num_datapoints=2000,
                     plot=True, error=['mse', 'mape'],
                     rel_metrics=True, opt=False, opt_runs=30):
+
+    if rel_metrics is not True:
+        r_error = None
 
     df = data_input.read_data(filename=filename,
                               freq=freq,
@@ -298,6 +329,7 @@ def slow_prediction(filename, freq, targetcol, datecol,
 
     if (error_3 < error_2) & (error_3 < error_1):
         pred = pred_3
+        reg = regressor_3
         print('Using LSTM prediction')
     elif(error_2 < error_1) & (error_2 < error_3):
         print('Using LightGBM prediction')
@@ -314,8 +346,10 @@ def slow_prediction(filename, freq, targetcol, datecol,
                                                n_steps=points,
                                                freq=freq)
             pred = pred_2_o
+            reg = regressor_2_o
         else:
             pred = pred_2
+            reg = regressor_2
     else:
         print('Using KNN Prediction')
         if opt:
@@ -331,8 +365,10 @@ def slow_prediction(filename, freq, targetcol, datecol,
                                                n_steps=points,
                                                freq=freq)
             pred = pred_1_o
+            reg = regressor_1_o
         else:
             pred = pred_1
+            reg = regressor_1
 
     if plot:
         plotting.plot_test_pred(y_test, pred)
@@ -350,11 +386,20 @@ def slow_prediction(filename, freq, targetcol, datecol,
                                  sep=sep, decimal=decimal,
                                  date_format=date_format, points=points,
                                  num_datapoints=num_datapoints)
-        r_error = metrics.relative_error(y_test, pred, naive)
+        r_error = metrics.relative_error(y_test, pred, naive['pred'])
         print('error relative to naïve prediction')
         print(r_error)
 
-    return pred, abs_error, r_error
+    response = {'filename': filename,
+                'features': features,
+                'regressor': reg,
+                'r_error': r_error,
+                'abs_error': abs_error,
+                'error': error,
+                'pred': pred,
+                'y_test': y_test
+                }
+    return response
 
 
 def naive_prediction(filename, freq, targetcol, datecol,
@@ -389,5 +434,15 @@ def naive_prediction(filename, freq, targetcol, datecol,
         print('Naïve error metrics:')
         print(error)
         print(abs_error)
+        reg = regressor
 
-    return pred
+    response = {'filename': filename,
+                'features': None,
+                'regressor': reg,
+                'r_error': None,
+                'abs_error': abs_error,
+                'error': error,
+                'pred': pred,
+                'y_true': y_test
+                }
+    return response
