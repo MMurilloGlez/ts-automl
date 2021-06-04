@@ -46,7 +46,7 @@ model = None
 
 app = FastAPI(title="TS-AutoML",
               description="Automated machine learning for time series" +
-                          "prediction",
+                          " prediction",
               version="0.1.3",
               debug=True)
 
