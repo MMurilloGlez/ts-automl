@@ -20,7 +20,6 @@ import statsmodels.api as sm
 from keras.models import Sequential
 from keras.layers import Dense, LSTM
 from tensorflow.keras.metrics import MeanAbsolutePercentageError
-from tcn import TCN
 from keras.wrappers.scikit_learn import KerasRegressor
 
 from sklearn.neighbors import KNeighborsRegressor
@@ -57,38 +56,10 @@ def LSTM_Model_gen(n_feat):
     return(model1)
 
 
-def TCN_Model_gen(n_feat):
-    """
-    Time convolutional neural net model construction for forecasting with keras
-
-    Consists of two TCN layers, with causal padding, relu activation and each
-    having 0.3 dropout rate. Last layer consists of one single neuron also
-    without activation function.
-
-    """
-    model3 = Sequential()
-    model3.add(TCN(input_shape=(1, n_feat),  return_sequences=True,
-                   use_batch_norm=True, activation='relu', padding='causal',
-                   dropout_rate=0.5))
-    model3.add(TCN(return_sequences=True, use_batch_norm=True,
-                   activation='relu', padding='causal', dropout_rate=0.5))
-    model3.add(Dense(1, activation='relu'))
-
-    model3.compile(loss='mape', optimizer='adam',
-                   metrics=MeanAbsolutePercentageError())
-    return(model3)
-
-
 def LSTM_Model(n_feat):
     return KerasRegressor(build_fn=(lambda: LSTM_Model_gen(n_feat)),
                           verbose=1,  batch_size=16,
                           epochs=50)
-
-
-def TCN_Model(n_feat):
-    return KerasRegressor(build_fn=(lambda: TCN_Model_gen(n_feat)),
-                          verbose=1,  batch_size=16,
-                          epochs=100)
 
 
 def GLM_Model():
@@ -174,14 +145,11 @@ def switch_features(value, lags_data, date, rolling_window, num):
         'max': lambda: max_feature(lags_data, rolling_window, num),
         'min': lambda: min_feature(lags_data, rolling_window, num),
         'quantile': lambda: quantile_feature(lags_data, rolling_window, num),
-        'iqr': lambda: iqr_feature(lags_data, rolling_window, num),
         'minute': lambda: minute_feature(date, num),
         'hour': lambda: hour_feature(date, num),
         'dayofweek': lambda: dayofweek_feature(date, num),
         'day': lambda: day_feature(date, num),
         'month': lambda: month_feature(date, num),
-        'quarter': lambda: quarter_feature(date, num),
-        'weekofyear': lambda: weekofyear_feature(date, num),
         'weekend': lambda: weekend_feature(date, num)
     }.get(value)()
 
@@ -333,58 +301,6 @@ def month_feature(date, num):
     """
     month = date.month
     if month == num:
-        return 1
-    else:
-        return 0
-
-
-def quarter_feature(date, num):
-    """One Hot encoding for fiscal quarter feature
-
-
-    One Hot encoding for the fiscal quarter feature of a given sample. takes a
-    1 as the value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-
-    Returns
-    -------
-    int
-        1 or 0
-    """
-    quarter = date.quarter
-    if quarter == num:
-        return 1
-    else:
-        return 0
-
-
-def weekofyear_feature(date, num):
-    """One Hot encoding for week of year feature
-
-
-    One Hot encoding for the week of year feature of a given sample. takes a 1
-    as the value if the feature is computed, 0 otherwise.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-
-    Returns
-    -------
-    int
-        1 or 0
-    """
-    weekofyear = date.weekofyear
-    if weekofyear == num:
         return 1
     else:
         return 0
@@ -549,36 +465,6 @@ def quantile_feature(data, rolling_window, num):
         return np.quantile(data[-rolling_window:], 0.5)
     else:
         return np.quantile(data[-(rolling_window-1+num):-(num-1)], 0.5)
-
-
-def iqr_feature(data, rolling_window, num):
-    """Computes the interquartile range for a given lag and its rolling
-    window
-
-
-    Given a set number of lags in the past, a set rolling window and the input
-    dataset, computes the rolling interquartile range value for the given
-    window.
-
-    Parameters
-    ----------
-    data: pd.Dataframe
-        input dataframe containing the time series.
-    num: int
-        lag number to calculate.
-    rolling_window: list of int
-        rolling window over which to calculate the feature.
-
-    Returns
-    -------
-    float
-        calculated feature
-    """
-    if num == 1:
-        return scipy.stats.iqr(data[-rolling_window:], rng=[25, 75])
-    else:
-        return scipy.stats.iqr(data[-(rolling_window-1+num):-(num-1)],
-                               rng=[25, 75])
 
 
 def create_features(feature_names, lags_data, date):

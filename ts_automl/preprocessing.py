@@ -168,12 +168,11 @@ def month_sample(X):
 
 def quarter_sample(X):
     """OneHot encoding for quarter of year feature"""
-    enc = OneHotEncoder(sparse='False', drop='first',
-                        categories=[list(range(0, 5))])
-    sample_np = np.array(X.index.isocalendar().week).reshape(-1, 1)
-    array = enc.fit_transform(sample_np).toarray()
-    columns = ['quarter_'+str(i) for i in range(1, 5)]
-    return pd.DataFrame(array, index=X.index, columns=columns)
+    enc = OneHotEncoder(sparse='False', drop='first', 
+                        categories=[list(range(0,5))])
+    array = enc.fit_transform(np.array(X.index.quarter).reshape(-1,1)).toarray()
+    columns = ['quarter_'+str(i) for i in range(1,5)]
+    return pd.DataFrame(array, index = X.index, columns = columns)
 
 
 def weekofyear_sample(X):
@@ -243,7 +242,7 @@ def iqr_sample(series, rolling_window=2):
     r_in = []
     for i in list(range(len(series)-rolling_window+1)):
         iqr_sc = scipy.stats.iqr(series.iloc[i:rolling_window+i, :])
-        r_in.append(iqr_sc, axis=0)
+        r_in.append(iqr_sc)
     r_in = pd.DataFrame(r_in)
     r_in.index = series.iloc[rolling_window-1:, :].index
     r_in.columns = series.columns

@@ -2,6 +2,8 @@ from ts_automl import __version__
 from ts_automl.pipelines import fast_prediction
 from ts_automl.pipelines import balanced_prediction
 from ts_automl.pipelines import slow_prediction
+from ts_automl.data_input import read_data
+from ts_automl.preprocessing import create_sample_feat
 from ts_automl import api
 from fastapi.testclient import TestClient
 
@@ -21,12 +23,12 @@ def test_version():
 client = TestClient(api.app)
 
 
-def test_root():
+def api_test_root():
     response = client.get("/")
     assert response.status_code == 200
 
 
-def test_training():
+def api_test_training():
 
     "Test the training data upload endpoint"
 
@@ -46,7 +48,9 @@ def test_training():
         ('features', ['mean', 'std', 'max', 'min', 'minute']),
         ('selected_feat', '20'),
         ('plot', 'true'),
-        ('error', ['mse', 'mape']),
+        ('error', ["mse", "rmse",
+                   "mape", "rsquare",
+                   "exp_var"]),
         ('rel_error', 'true'),
         ('opt', 'false'),
         ('opt_runs', '10'),
@@ -64,12 +68,35 @@ def test_training():
     assert response.status_code == 200
 
 
-def test_fit():
+def api_test_fit():
     "Test the model fit endpoint"
     response = client.get("/Fit/")
     assert response.status_code == 200
 
 # Prediction tests
+
+
+def test_build_feat():
+    """Test building all different features for time series"""
+
+    df = read_data(filename='./tests/test_series/Serie4.csv',
+                   freq='5T',
+                   targetcol='VALUE',
+                   datecol='DATE',
+                   sep=';',
+                   decimal=',',
+                   date_format="%d/%m/%Y %H:%M:%S.%f")
+
+    features = ["mean", "std", "max", "min", "quantile", "minute",
+                "hour", "dayofweek", "day", "month", "weekend"]
+
+    y_train = df
+    X_train = create_sample_feat(y_train,
+                                 window_length=10,
+                                 features=features,
+                                 rolling_window=[5])
+
+    assert X_train is not None
 
 
 def test_fast_1():
