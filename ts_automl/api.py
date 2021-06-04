@@ -44,7 +44,11 @@ class Feat(str, Enum):
 path = ''
 model = None
 
-app = FastAPI(debug=True)
+app = FastAPI(title="TS-AutoML",
+              description="Automated machine learning for time series" +
+                          "prediction",
+              version="0.1.3",
+              debug=True)
 
 
 @app.get("/")
