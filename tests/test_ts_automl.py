@@ -2,6 +2,7 @@ from ts_automl import __version__
 from ts_automl.pipelines import fast_prediction
 from ts_automl.pipelines import balanced_prediction
 from ts_automl.pipelines import slow_prediction
+from ts_automl.pipelines import pipeline
 from ts_automl.data_input import read_data
 from ts_automl.preprocessing import create_sample_feat
 from ts_automl import api
@@ -99,6 +100,25 @@ def test_build_feat():
     assert X_train is not None
 
 
+def test_load_data():
+    """Tests loading data from file using class object"""
+
+    global model
+    model = pipeline(filename='./tests/test_series/Serie1.csv',
+                     type='fast',
+                     freq='10T'
+                     )
+
+    assert model.df is not None
+
+
+def test_fit_model():
+    """Tests that the model can support the fit method"""
+
+    model.fit()
+
+    assert model.r_error < 100
+
 def test_fast_1():
     """
     Test for fast prediction time, using knn, series 1
@@ -131,7 +151,7 @@ def test_fast_2():
                                decimal=',',
                                date_format="%d/%m/%Y %H:%M:%S.%f",
                                plot=False,
-                               opt=True,)
+                               opt=False)
 
     assert test_f_2['r_error'] < 100
 

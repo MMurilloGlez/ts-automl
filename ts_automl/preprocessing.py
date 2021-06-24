@@ -12,7 +12,6 @@ from sklearn.base import TransformerMixin
 from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
 from skits.preprocessing import HorizonTransformer
 import lightgbm as lgb
-import scipy
 
 scaler = MinMaxScaler(feature_range=(0, 1))
 
@@ -166,26 +165,6 @@ def month_sample(X):
     return pd.DataFrame(array, index=X.index, columns=columns)
 
 
-def quarter_sample(X):
-    """OneHot encoding for quarter of year feature"""
-    enc = OneHotEncoder(sparse='False', drop='first', 
-                        categories=[list(range(0,5))])
-    array = enc.fit_transform(np.array(X.index.quarter).reshape(-1,1)).toarray()
-    columns = ['quarter_'+str(i) for i in range(1,5)]
-    return pd.DataFrame(array, index = X.index, columns = columns)
-
-
-def weekofyear_sample(X):
-    """OneHot encoding for week number feature"""
-    enc = OneHotEncoder(sparse='False', drop='first',
-                        categories=[list(range(0, 53))])
-    sample_np = np.array(X.index.isocalendar().week).reshape(-1, 1)
-    array = enc.fit_transform(sample_np)
-    array = array.toarray()
-    columns = ['weekofyear_'+str(i) for i in range(1, 53)]
-    return pd.DataFrame(array, index=X.index, columns=columns)
-
-
 def weekend_sample(X):
     """OneHot encoding for weekend feature (Binary)"""
     saturday = X.index.dayofweek == 5
@@ -238,19 +217,6 @@ def quantile_sample(X, rolling_window=2):
     return X_q
 
 
-def iqr_sample(series, rolling_window=2):
-    r_in = []
-    for i in list(range(len(series)-rolling_window+1)):
-        iqr_sc = scipy.stats.iqr(series.iloc[i:rolling_window+i, :])
-        r_in.append(iqr_sc)
-    r_in = pd.DataFrame(r_in)
-    r_in.index = series.iloc[rolling_window-1:, :].index
-    r_in.columns = series.columns
-    r_in.rename(columns=lambda x: x.replace('lag', 'iqr' + '_' +
-                str(rolling_window)),
-                inplace=True)
-    return r_in
-
 # -----------------------------------------------------------------------------
 
 
@@ -297,15 +263,11 @@ def switch_sample_features(value, X, lags_X, rolling_window):
         'max': lambda: max_sample(lags_X, rolling_window),
         'min': lambda: min_sample(lags_X, rolling_window),
         'quantile': lambda: quantile_sample(lags_X, rolling_window),
-        'iqr': lambda: iqr_sample(lags_X, rolling_window),
-
         'minute': lambda: minute_sample(X),
         'hour': lambda: hour_sample(X),
         'dayofweek': lambda: dayofweek_sample(X),
         'day': lambda: day_sample(X),
         'month': lambda: month_sample(X),
-        'quarter': lambda: quarter_sample(X),
-        'weekofyear': lambda: weekofyear_sample(X),
         'weekend': lambda: weekend_sample(X)
 
     }.get(value)()

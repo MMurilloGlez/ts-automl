@@ -10,7 +10,6 @@ import numpy as np
 import pandas as pd
 import datetime
 
-import scipy
 from sklearn.preprocessing import MinMaxScaler
 
 from sktime.forecasting.naive import NaiveForecaster
@@ -58,7 +57,7 @@ def LSTM_Model_gen(n_feat):
 
 def LSTM_Model(n_feat):
     return KerasRegressor(build_fn=(lambda: LSTM_Model_gen(n_feat)),
-                          verbose=1,  batch_size=16,
+                          verbose=0,  batch_size=8,
                           epochs=50)
 
 
