@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from enum import Enum
 from ts_automl.data_input import read_data
 from ts_automl.pipelines import fast_prediction, slow_prediction
-from ts_automl.pipelines import balanced_prediction
+from ts_automl.pipelines import balanced_prediction, pipeline
 from json import dump, load
 import os
 from argparse import Namespace
@@ -79,7 +79,7 @@ async def upload_csv(file: UploadFile = File(...),
                      rel_error: Optional[bool] = Query(True),
                      opt: Optional[bool] = Query(False),
                      opt_runs: Optional[int] = Query(10),
-                     fit_type: Optional[Pred_time] = Query([Pred_time.fast])
+                     type: Optional[Pred_time] = Query([Pred_time.fast])
                      ):
     try:
         os.mkdir("./train_data")
@@ -94,6 +94,7 @@ async def upload_csv(file: UploadFile = File(...),
         f.close()
 
     response = {"filename": filename,
+                "type": type,
                 "datecol": datecol,
                 "targetcol": targetcol,
                 "dateformat": dateformat,
@@ -101,7 +102,6 @@ async def upload_csv(file: UploadFile = File(...),
                 "decimal": decimal,
                 "freq": freq,
                 "points": points,
-                "fit_type": fit_type,
                 "plot": plot,
                 "error": error,
                 "rel_error": rel_error,
@@ -116,15 +116,19 @@ async def upload_csv(file: UploadFile = File(...),
                 }
     server_response = jsonable_encoder(response)
 
-    df = read_data(filename,
-                   targetcol,
-                   datecol,
-                   sep,
-                   decimal,
-                   dateformat,
-                   freq
-                   )
-    response['data'] = df.to_json()
+    global model
+    model = pipeline(filename='./tests/test_series/Serie1.csv',
+                     type=type, targetcol=targetcol, datecol=datecol,
+                     plot=plot, points=points, error=error, rel_error=rel_error,
+                     features=features, selected_feat=selected_feat,
+                     window_length=window_length, rolling_window=rolling_window,
+                     horizon=horizon, opt=opt, opt_runs=opt_runs,
+                     num_datapoints=num_datapoints, sep=sep, decimal=decimal,
+                     dateformat=dateformat, freq=freq
+                     )
+
+
+    response['data'] = model.df.to_json()
 
     metadata_file = filename[:-4]+"_metadata.txt"
     global path
@@ -138,28 +142,26 @@ async def upload_csv(file: UploadFile = File(...),
 
 
 @app.get('/Fit/')
-async def model_fit():
-    global path, model
+async def model_fitting():
+
     if path == '':
         response = 'No training data uploaded.'
     else:
-        f = load(open(path))
-        f = Namespace(**f)
-        if f.fit_type == 'fast':
-            fast_prediction(f.filename, f.freq, f.targetcol, f.datecol,
-                            f.sep, f.decimal, f.dateformat)
-        elif f.fit_type == 'balanced':
-            balanced_prediction(f.filename, f.freq, f.targetcol, f.datecol,
-                                f.sep, f.decimal, f.dateformat)
+        if model.opt:
+            model_fit = model.fit_opt()
+            response = model_fit
         else:
-            slow_prediction(f.filename, f.freq, f.targetcol, f.datecol,
-                            f.sep, f.decimal, f.dateformat)
-        response = 'fit successful'
+            model_fit = model.fit()
+            response = model_fit
 
     return{response}
 
 
 @app.get('/Predict/')
 async def model_predict(horizon: int = Query(50)):
-
-    return{'This feature is not yet working'}
+    if model.abs_error is None:
+        response = 'Use /Fit/ method first'
+    elif model.abs_error is not None:
+        prediction = model.predict(num_points=horizon)
+        response = prediction
+    return(response)

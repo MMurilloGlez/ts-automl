@@ -602,7 +602,7 @@ class pipeline(object):
         This method doesn't accept parameters but rather inherits from the ones
         defined in __init__
         """
-
+        self.modeltype = 'Pandas'
         regressor_1 = prediction.KNN_Model
         regressor_2 = prediction.LGB_Model
         regressor_3 = prediction.LSTM_Model(n_feat=self.selected_feat)
@@ -872,7 +872,7 @@ class pipeline(object):
 
         return response
 
-    def predict(self, new_data=None, num_points=50):
+    def predict(self, num_points=50):
         """
         Predicts using pre-fitted model, optionally with new data
 
@@ -889,9 +889,8 @@ class pipeline(object):
                 Predictions generated from the training data
 
         """
-        if new_data is None:
-            pass
-        elif self.modeltype == 'Numpy':
+
+        if self.modeltype == 'Numpy':
             pred_r = prediction.rec_forecast_np(y=self.df,
                                                 model=self.model,
                                                 window_length=self.window_length,
