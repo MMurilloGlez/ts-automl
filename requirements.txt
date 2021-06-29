@@ -19,9 +19,9 @@ cloudpickle==1.6.0; python_version >= "3.5" \
 decorator==4.4.2; python_version >= "3.6" and python_full_version < "3.0.0" or python_full_version >= "3.2.0" and python_version >= "3.6" \
     --hash=sha256:41fa54c2a0cc4ba648be4fd43cff00aedf5b9465c9bf18d64325bc225f08f760 \
     --hash=sha256:e3a62f0520172440ca0dcc823749319382e377f37f140a0b99ef45fecb84bfe7
-fastapi==0.65.1; python_version >= "3.6" \
-    --hash=sha256:7619282fbce0ec53c7dfa3fa262280c00ace9f6d772cfd06e4ab219dce66985e \
-    --hash=sha256:478b7e0cbb52c9913b9903d88ae14195cb8a479c4596e0b2f2238d317840a7dc
+fastapi==0.65.2; python_version >= "3.6" \
+    --hash=sha256:39569a18914075b2f1aaa03bcb9dc96a38e0e5dabaf3972e088c9077dfffa379 \
+    --hash=sha256:8359e55d8412a5571c0736013d90af235d6949ec4ce978e9b63500c8f4b6f714
 flatbuffers==1.12 \
     --hash=sha256:9e9ef47fa92625c4721036e7c4124182668dc6021d9e7c73704edd395648deb9 \
     --hash=sha256:63bb9a722d5e373701913e226135b28a6f6ac200d5cc7b4d919fa38d73b44610
@@ -110,8 +110,7 @@ h5py==2.10.0 \
     --hash=sha256:6ef7ab1089e3ef53ca099038f3c0a94d03e3560e6aff0e9d6c64c55fb13fc681 \
     --hash=sha256:769e141512b54dee14ec76ed354fcacfc7d97fea5a7646b709f7400cf1838630 \
     --hash=sha256:84412798925dc870ffd7107f045d7659e60f5d46d1c70c700375248bf6bf512d
-hpsklearn==0.0.3 \
-    --hash=sha256:e530ed3f985f4eb4fd84fe29a6aaf4e8af03b7ff0584a30f7438f252faeaac84
+hpsklearn @ git+https://github.com/hyperopt/hyperopt-sklearn@master
 hyperopt==0.2.5 \
     --hash=sha256:dc5c7cceaf33c125b727cf92709e70035d94dd507831dae66406ac762a18a253 \
     --hash=sha256:bc6047d50f956ae64eebcb34b1fd40f186a93e214957f20e87af2f10195295cc

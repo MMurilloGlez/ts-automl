@@ -16,7 +16,7 @@ def test_version():
     Will pass if version is same as the one expected by the test.
     """
 
-    assert __version__ == '0.1.3'
+    assert __version__ == '0.1.4'
 
 # API Tests
 
@@ -75,6 +75,7 @@ def api_test_fit():
     response = client.get("/Fit/")
     assert response.status_code == 200
 
+
 def api_test_predict():
     "Tests the model predict endpoint"
     response = client.get("/Predict/")
@@ -125,11 +126,13 @@ def test_fit_model():
 
     assert model.r_error < 100
 
+
 def test_predict_model():
     "Tests that the model's predict method works"
-    
+
     pred = model.predict()
     assert pred is not None
+
 
 def test_fast_1():
     """

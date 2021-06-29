@@ -2,12 +2,10 @@ from typing import Optional, List
 from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.encoders import jsonable_encoder
 from enum import Enum
-from ts_automl.data_input import read_data
-from ts_automl.pipelines import fast_prediction, slow_prediction
-from ts_automl.pipelines import balanced_prediction, pipeline
-from json import dump, load
+
+from ts_automl.pipelines import pipeline
+from json import dump
 import os
-from argparse import Namespace
 
 
 class Pred_time(str, Enum):
@@ -126,7 +124,6 @@ async def upload_csv(file: UploadFile = File(...),
                      num_datapoints=num_datapoints, sep=sep, decimal=decimal,
                      dateformat=dateformat, freq=freq
                      )
-
 
     response['data'] = model.df.to_json()
 
