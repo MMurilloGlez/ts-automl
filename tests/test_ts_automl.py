@@ -2,7 +2,7 @@ from ts_automl import __version__
 from ts_automl.pipelines import fast_prediction
 from ts_automl.pipelines import balanced_prediction
 from ts_automl.pipelines import slow_prediction
-from ts_automl.pipelines import pipeline
+from ts_automl.pipelines import Pipeline
 from ts_automl.data_input import read_data
 from ts_automl.preprocessing import create_sample_feat
 from ts_automl import api
@@ -111,7 +111,7 @@ def test_load_data():
     """Tests loading data from file using class object"""
 
     global model
-    model = pipeline(filename='./tests/test_series/Serie1.csv',
+    model = Pipeline(filename='./tests/test_series/Serie1.csv',
                      type='fast',
                      freq='10T'
                      )

@@ -3,7 +3,7 @@ from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.encoders import jsonable_encoder
 from enum import Enum
 
-from ts_automl.pipelines import pipeline
+from ts_automl.pipelines import Pipeline
 from json import dump
 import os
 
@@ -115,7 +115,7 @@ async def upload_csv(file: UploadFile = File(...),
     server_response = jsonable_encoder(response)
 
     global model
-    model = pipeline(filename='./tests/test_series/Serie1.csv',
+    model = Pipeline(filename='./tests/test_series/Serie1.csv',
                      type=type, targetcol=targetcol, datecol=datecol,
                      plot=plot, points=points, error=error, rel_error=rel_error,
                      features=features, selected_feat=selected_feat,
