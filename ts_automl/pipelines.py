@@ -469,7 +469,7 @@ def naive_prediction(filename, freq, targetcol, datecol,
     return response
 
 
-class pipeline(object):
+class Pipeline(object):
     def __init__(self, filename: str,
                  type: str = 'balanced', freq: str = "15T",
                  targetcol: str = "VALUE", datecol: str = "DATE",
