@@ -203,6 +203,7 @@ to launch the API the module launch the following line of code once the library 
 
 ```python
 from ts_automl import api
+api.run_api()
 ```
 
 This will automatically launch the api on import, which can be reached at:

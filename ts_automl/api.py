@@ -164,4 +164,18 @@ async def model_predict(horizon: int = Query(50)):
         response = prediction
     return(response)
 
-uvicorn.run("ts_automl.api:app", host="127.0.0.1", port=2021, log_level="debug")
+
+def run_api(port=2021, log_level='debug'):
+    """
+    Launch FastAPI using uvicorn server
+
+    Parameters
+    ----------
+    port: int
+        Port on ehich to launch the server
+    log_level: str
+        Level of logs to use, can be 'critical', 'error', 'warning', 'info', 
+        'debug', 'trace'.
+    """
+    uvicorn.run("ts_automl.api:app", host="127.0.0.1", port=port,
+                log_level=log_level)
