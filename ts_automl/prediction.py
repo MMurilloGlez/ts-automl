@@ -90,14 +90,14 @@ KNN_Model = KNeighborsRegressor(n_jobs=-1)
 LGB_Model = LGBMRegressor(n_jobs=-1)
 
 
-def KNN_Model_Opt(opt_runs=10, knn_reg_params=knn_reg_params):
+def KNN_Model_Opt(opt_runs=50, knn_reg_params=knn_reg_params):
     return(HE(regressor=knn_reg('knnopt', **knn_reg_params),
               algo=tpe.suggest,
               max_evals=opt_runs,
               n_jobs=-1))
 
 
-def LGB_Model_Opt(opt_runs=10, lgb_reg_params=lgb_reg_params):
+def LGB_Model_Opt(opt_runs=50, lgb_reg_params=lgb_reg_params):
 
     return(HE(regressor=lgb_reg('lgbmopt', **lgb_reg_params),
               algo=tpe.suggest,
@@ -484,7 +484,7 @@ def create_features(feature_names, lags_data, date):
 
 
 def rec_forecast(y, model, window_length, feature_names, rolling_window,
-                 n_steps, freq):
+                 n_steps, freq, scaler):
     """
     Forecasting function which applies a given model recursively in a series
 
@@ -518,8 +518,10 @@ def rec_forecast(y, model, window_length, feature_names, rolling_window,
     lags = list(y.iloc[-(window_length+(max_rol-1)):, 0].values)
 
     for i in range(n_steps):
-        train = create_features(feature_names, lags, target_range[i])
-        new_value = model.predict(pd.DataFrame(train).transpose())
+        train = create_features(feature_names, lags,
+                                target_range[i])
+        train = scaler.transform(np.asarray(train).reshape(1, -1))
+        new_value = model.predict(pd.DataFrame(train))
         target_value[i] = new_value[0]
         lags.pop(0)
         lags.append(new_value[0])
@@ -528,7 +530,7 @@ def rec_forecast(y, model, window_length, feature_names, rolling_window,
 
 
 def rec_forecast_np(y, model, window_length, feature_names,
-                    rolling_window, n_steps, freq):
+                    rolling_window, n_steps, freq, scaler):
     """
     Recursive forecast function using numpy arrays
 
@@ -558,9 +560,10 @@ def rec_forecast_np(y, model, window_length, feature_names,
     lags = list(y.iloc[-(window_length+(max_rol-1)):, 0].values)
 
     for i in range(n_steps):
-        train = create_features(feature_names, lags, target_range[i])
+        train = create_features(feature_names, lags,
+                                target_range[i])
         train_np = np.array(train, dtype='float32')
-        train_np_s = (train_np.reshape(-1, 1))
+        train_np_s = scaler.transform((train_np.reshape(1, -1)))
         new_value = model.predict(train_np_s.reshape(-1, 1,
                                   len(feature_names)))
         new_valu_0 = new_value

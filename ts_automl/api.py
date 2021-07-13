@@ -1,6 +1,7 @@
 from typing import Optional, List
 from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.encoders import jsonable_encoder
+import uvicorn
 from enum import Enum
 
 from ts_automl.pipelines import Pipeline
@@ -45,7 +46,7 @@ model = None
 app = FastAPI(title="TS-AutoML",
               description="Automated machine learning for time series" +
                           " prediction",
-              version="0.1.3",
+              version="0.2.0",
               debug=True)
 
 
@@ -162,3 +163,5 @@ async def model_predict(horizon: int = Query(50)):
         prediction = model.predict(num_points=horizon)
         response = prediction
     return(response)
+
+uvicorn.run("ts_automl.api:app", host="127.0.0.1", port=2021, log_level="debug")

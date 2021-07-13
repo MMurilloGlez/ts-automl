@@ -26,7 +26,7 @@ pip install wheel
 install the library using pip install
 
 ```python
-pip install './ts-automl/dist/ts_automl-0.1.4-py3-none-any.whl'
+pip install './ts-automl/dist/ts_automl-0.2.0-py3-none-any.whl'
 ```
 installation will take a while depending on the number of dependencies already on your system
 
@@ -197,4 +197,16 @@ error: list of str ['mape','mse','r2', 'exp_var']
         Error metrics to calculate with respect to the test data 
 ```
 
+## Launching API
 
+to launch the API the module launch the following line of code once the library is installed:
+
+```python
+from ts_automl import api
+```
+
+This will automatically launch the api on import, which can be reached at:
+```localhost:2021```
+
+The interactive SwaggerUI version can be reached at:
+```localhost:2021/docs```

@@ -9,11 +9,11 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.base import TransformerMixin
-from sklearn.preprocessing import OneHotEncoder, MinMaxScaler
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from skits.preprocessing import HorizonTransformer
 import lightgbm as lgb
 
-scaler = MinMaxScaler(feature_range=(0, 1))
+scaler = StandardScaler()
 
 
 def ts_split(data, test_size=100):
@@ -118,21 +118,21 @@ def lags_sample(df, window_length=5, step=1):
 def minute_sample(X):
     """OneHot encoding for the minute in hour feature"""
 
-    enc = OneHotEncoder(sparse='False', drop='first',
-                        categories=[list(range(0, 61))])
+    enc = OneHotEncoder(sparse='False',
+                        categories=[list(range(0, 60))])
     array = enc.fit_transform(np.array(X.index.minute).reshape(-1, 1))
     array = array.toarray()
-    columns = ['minute_'+str(i) for i in range(1, 61)]
+    columns = ['minute_'+str(i) for i in range(0, 60)]
     return pd.DataFrame(array, index=X.index, columns=columns)
 
 
 def hour_sample(X):
     """Onehot encoding for the hour of day feature"""
-    enc = OneHotEncoder(sparse='False', drop='first',
-                        categories=[list(range(0, 25))])
+    enc = OneHotEncoder(sparse='False',
+                        categories=[list(range(0, 24))])
     array = enc.fit_transform(np.array(X.index.hour).reshape(-1, 1))
     array = array.toarray()
-    columns = ['hour_'+str(i) for i in range(1, 25)]
+    columns = ['hour_'+str(i) for i in range(0, 24)]
     return pd.DataFrame(array, index=X.index, columns=columns)
 
 

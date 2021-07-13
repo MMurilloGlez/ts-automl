@@ -1,7 +1,4 @@
 from ts_automl import __version__
-from ts_automl.pipelines import fast_prediction
-from ts_automl.pipelines import balanced_prediction
-from ts_automl.pipelines import slow_prediction
 from ts_automl.pipelines import Pipeline
 from ts_automl.data_input import read_data
 from ts_automl.preprocessing import create_sample_feat
@@ -16,7 +13,7 @@ def test_version():
     Will pass if version is same as the one expected by the test.
     """
 
-    assert __version__ == '0.1.4'
+    assert __version__ == '0.2.0'
 
 # API Tests
 
@@ -144,169 +141,143 @@ def test_fast_1():
     comparison with the naive model, the test will pass
     """
 
-    test_f_1 = fast_prediction(filename='./tests/test_series/Serie1.csv',
-                               freq='10T',
-                               targetcol='VALUE',
-                               datecol='DATE',
-                               sep=';',
-                               decimal=',',
-                               date_format="%d/%m/%Y %H:%M:%S.%f",
-                               plot=False)
+    model_1 = Pipeline(filename='./tests/test_series/Serie1.csv',
+                       type='fast',
+                       freq='10T'
+                       )
+    model_1.fit()
 
-    assert test_f_1['r_error'] < 100
+    assert model_1.r_error < 100
 
 
 def test_fast_2():
     """Test for fast prediction time, using knn, series 2"""
-    test_f_2 = fast_prediction(filename='./tests/test_series/Serie2.csv',
-                               freq='1T',
-                               targetcol='VALUE',
-                               datecol='DATE',
-                               sep=';',
-                               decimal=',',
-                               date_format="%d/%m/%Y %H:%M:%S.%f",
-                               plot=False,
-                               opt=False)
 
-    assert test_f_2['r_error'] < 100
+    model_2 = Pipeline(filename='./tests/test_series/Serie2.csv',
+                       type='fast',
+                       freq='1T')
+    model_2.fit()
+
+    assert model_2.r_error < 100
 
 
 def test_fast_3():
     """Test for fast prediction time, using knn, series 3"""
-    test_f_3 = fast_prediction(filename='./tests/test_series/Serie3.csv',
-                               freq='15T',
-                               targetcol='INSTALACIONES [kWh]',
-                               datecol='MSJO_DATUM',
-                               sep=';',
-                               decimal='.',
-                               date_format="%d/%m/%Y %H:%M",
-                               plot=False)
 
-    assert test_f_3['r_error'] < 100
+    model_3 = Pipeline(filename='./tests/test_series/Serie3.csv',
+                       type='fast',
+                       freq='15T',
+                       targetcol='INSTALACIONES [kWh]',
+                       datecol='MSJO_DATUM',
+                       sep=';',
+                       decimal='.',
+                       date_format="%d/%m/%Y %H:%M",
+                       plot=True)
+    model_3.fit()
+    assert model_3.r_error < 100
 
 
 def test_fast_4():
     """Test for fast prediction time, using knn, series 4"""
-    test_f_4 = fast_prediction(filename='./tests/test_series/Serie4.csv',
-                               freq='5T',
-                               targetcol='VALUE',
-                               datecol='DATE',
-                               sep=';',
-                               decimal=',',
-                               date_format="%d/%m/%Y %H:%M:%S.%f",
-                               plot=False)
 
-    assert test_f_4['r_error'] < 100
+    model_4 = Pipeline(filename='./tests/test_series/Serie4.csv',
+                       type='fast',
+                       freq='5T'
+                       )
+    model_4.fit()
+
+    assert model_4.r_error < 100
 
 
 def test_bal_1():
     """Test for balanced prediction time, using lightgbm, series 1"""
-    test_b_1 = balanced_prediction(filename='./tests/test_series/Serie1.csv',
-                                   freq='10T',
-                                   targetcol='VALUE',
-                                   datecol='DATE',
-                                   sep=';',
-                                   decimal=',',
-                                   date_format="%d/%m/%Y %H:%M:%S.%f",
-                                   plot=False)
-    assert test_b_1['r_error'] < 100
+    model_1 = Pipeline(filename='./tests/test_series/Serie1.csv',
+                       type='balanced',
+                       freq='10T'
+                       )
+    model_1.fit()
+
+    assert model_1.r_error < 100
 
 
 def test_bal_2():
     """Test for balanced prediction time, using lightgbm, series 1"""
-    test_b_2 = balanced_prediction(filename='./tests/test_series/Serie2.csv',
-                                   freq='5T',
-                                   targetcol='VALUE',
-                                   datecol='DATE',
-                                   sep=';',
-                                   decimal=',',
-                                   date_format="%d/%m/%Y %H:%M:%S.%f",
-                                   plot=False,
-                                   opt=False,
-                                   opt_runs=10)
+    model_2 = Pipeline(filename='./tests/test_series/Serie2.csv',
+                       type='balanced',
+                       freq='1T')
+    model_2.fit()
 
-    assert test_b_2['r_error'] < 100
+    assert model_2.r_error < 100
 
 
 def test_bal_3():
     """Test for balanced prediction time, using lightgbm, series 3"""
-    test_b_3 = balanced_prediction(filename='./tests/test_series/Serie3.csv',
-                                   freq='15T',
-                                   targetcol='INSTALACIONES [kWh]',
-                                   datecol='MSJO_DATUM',
-                                   sep=';',
-                                   decimal='.',
-                                   date_format="%d/%m/%Y %H:%M",
-                                   plot=False)
-
-    assert test_b_3['r_error'] < 100
+    model_3 = Pipeline(filename='./tests/test_series/Serie3.csv',
+                       type='balanced',
+                       freq='15T',
+                       targetcol='INSTALACIONES [kWh]',
+                       datecol='MSJO_DATUM',
+                       sep=';',
+                       decimal='.',
+                       date_format="%d/%m/%Y %H:%M",
+                       plot=True)
+    model_3.fit()
+    assert model_3.r_error < 100
 
 
 def test_bal_4():
     """Test for balanced prediction time, using lightgbm, series 4"""
-    test_b_3 = balanced_prediction(filename='./tests/test_series/Serie4.csv',
-                                   freq='5T',
-                                   targetcol='VALUE',
-                                   datecol='DATE',
-                                   sep=';',
-                                   decimal=',',
-                                   date_format="%d/%m/%Y %H:%M:%S.%f",
-                                   plot=False)
+    model_4 = Pipeline(filename='./tests/test_series/Serie4.csv',
+                       type='balanced',
+                       freq='5T'
+                       )
+    model_4.fit()
 
-    assert test_b_3['r_error'] < 100
+    assert model_4.r_error < 100
 
 
 def test_slow_1():
     """Test for slow prediction time, using keras, series 1"""
-    test_s_1 = slow_prediction(filename='./tests/test_series/Serie1.csv',
-                               freq='10T',
-                               targetcol='VALUE',
-                               datecol='DATE',
-                               sep=';',
-                               decimal=',',
-                               date_format="%d/%m/%Y %H:%M:%S.%f",
-                               plot=False)
+    model_1 = Pipeline(filename='./tests/test_series/Serie1.csv',
+                       type='slow',
+                       freq='10T'
+                       )
+    model_1.fit()
 
-    assert test_s_1['r_error'] < 100
+    assert model_1.r_error < 100
 
 
 def test_slow_2():
     """Test for slow prediction time, using keras, series 2"""
-    test_s_2 = slow_prediction(filename='./tests/test_series/Serie2.csv',
-                               freq='1T',
-                               targetcol='VALUE',
-                               datecol='DATE',
-                               sep=';',
-                               decimal=',',
-                               date_format="%d/%m/%Y %H:%M:%S.%f",
-                               plot=False)
+    model_2 = Pipeline(filename='./tests/test_series/Serie2.csv',
+                       type='slow',
+                       freq='1T')
+    model_2.fit()
 
-    assert test_s_2['r_error'] < 100
+    assert model_2.r_error < 100
 
 
 def test_slow_3():
     """Test for slow prediction time, using keras, series 3"""
-    test_s_3 = slow_prediction(filename='./tests/test_series/Serie3.csv',
-                               freq='15T',
-                               targetcol='INSTALACIONES [kWh]',
-                               datecol='MSJO_DATUM',
-                               sep=';',
-                               decimal='.',
-                               date_format="%d/%m/%Y %H:%M",
-                               plot=False)
-
-    assert test_s_3['r_error'] < 100
+    model_3 = Pipeline(filename='./tests/test_series/Serie3.csv',
+                       type='slow',
+                       freq='15T',
+                       targetcol='INSTALACIONES [kWh]',
+                       datecol='MSJO_DATUM',
+                       sep=';',
+                       decimal='.',
+                       date_format="%d/%m/%Y %H:%M",
+                       plot=True)
+    model_3.fit()
+    assert model_3.r_error < 100
 
 
 def test_slow_4():
     """Test for fast prediction time, using keras, series 4"""
-    test_s_4 = slow_prediction(filename='./tests/test_series/Serie4.csv',
-                               freq='5T',
-                               targetcol='VALUE',
-                               datecol='DATE',
-                               sep=';',
-                               decimal=',',
-                               date_format="%d/%m/%Y %H:%M:%S.%f",
-                               plot=False)
+    model_4 = Pipeline(filename='./tests/test_series/Serie4.csv',
+                       type='slow',
+                       freq='5T'
+                       )
+    model_4.fit()
 
-    assert test_s_4['r_error'] < 100
+    assert model_4.r_error < 100

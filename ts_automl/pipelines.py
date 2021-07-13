@@ -19,456 +19,6 @@ features = ["mean", "std", "max", "min", "quantile", "minute",
             "hour", "dayofweek", "day", "month", "weekend"]
 
 
-def fast_prediction(filename, freq, targetcol, datecol,
-                    sep, decimal, date_format,
-                    points=50, window_length=100, rolling_window=[5, 10, 20],
-                    horizon=1, step=1, num_datapoints=2000,
-                    features=features,
-                    selected_feat=50, plot=True, error=['mse', 'mape'],
-                    rel_metrics=True, opt=False, opt_runs=10,
-                    plot_train=True):
-
-    if rel_metrics is not True:
-        r_error = None
-
-    df = data_input.read_data(filename=filename,
-                              freq=freq,
-                              targetcol=targetcol,
-                              datecol=datecol,
-                              sep=sep,
-                              decimal=decimal,
-                              date_format=date_format)
-
-    y_train, y_test = pre.ts_split(df, test_size=points)
-    y_train = y_train.iloc[-num_datapoints:, :]
-    X_train = pre.create_sample_feat(y_train,
-                                     window_length=window_length,
-                                     features=features,
-                                     rolling_window=rolling_window)
-
-    X_train = X_train.loc[:, ~X_train.columns.duplicated()]
-    X_train = X_train.iloc[-num_datapoints:, :]
-
-    y_horizon = pre.create_horizon(y_train, horizon)
-    y_horizon = y_horizon.loc[X_train.index[0]:, :]
-
-    best_features = pre.feature_selection(X_train,
-                                          y_horizon.values.ravel(),
-                                          selected_feat)
-
-    X_train_selec = X_train.loc[:, best_features]
-
-    regressor = prediction.KNN_Model
-    regressor.fit(X=X_train_selec,
-                  y=y_horizon.values.ravel())
-
-    pred = prediction.rec_forecast(y=y_train,
-                                   model=regressor,
-                                   window_length=window_length,
-                                   feature_names=best_features,
-                                   rolling_window=rolling_window,
-                                   n_steps=points,
-                                   freq=freq)
-    reg = regressor
-    if opt:
-
-        regressor_1_o = prediction.KNN_Model_Opt(opt_runs=opt_runs)
-        regressor_1_o.fit(X=X_train_selec,
-                          y=y_horizon.values.ravel())
-        pred_1_o = prediction.rec_forecast(y=y_train,
-                                           model=regressor_1_o,
-                                           window_length=window_length,
-                                           feature_names=best_features,
-                                           rolling_window=rolling_window,
-                                           n_steps=points,
-                                           freq=freq)
-        pred = pred_1_o
-        reg = regressor_1_o
-
-    if plot:
-        plotting.plot_test_pred(y_test, pred)
-
-    if plot_train:
-        plotting.plot_train(y_train.iloc[-2000:, :])
-
-    if error:
-        abs_error = []
-        for i in error:
-            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
-        print(error)
-        print(abs_error)
-
-    if rel_metrics:
-        naive = naive_prediction(filename=filename, freq=freq,
-                                 targetcol=targetcol, datecol=datecol,
-                                 sep=sep, decimal=decimal,
-                                 date_format=date_format, points=points,
-                                 num_datapoints=num_datapoints)
-        r_error = metrics.relative_error(y_test, pred, naive['pred'])
-        print('error relative to naïve prediction')
-        print(r_error)
-    response = {'filename': filename,
-                'features': features,
-                'regressor': reg,
-                'r_error': r_error,
-                'abs_error': abs_error,
-                'error': error,
-                'pred': pred,
-                'y_true': y_test,
-                'naive': naive
-                }
-    return response
-
-
-def balanced_prediction(filename, freq, targetcol, datecol,
-                        sep, decimal, date_format,
-                        points=50, window_length=100,
-                        rolling_window=[5, 10, 20], horizon=1, step=1,
-                        features=features,
-                        selected_feat=50, num_datapoints=2000,
-                        plot=True, error=['mse', 'mape'],
-                        rel_metrics=True, opt=False, opt_runs=10,
-                        plot_train=True):
-
-    if rel_metrics is not True:
-        r_error = None
-
-    df = data_input.read_data(filename=filename,
-                              freq=freq,
-                              targetcol=targetcol,
-                              datecol=datecol,
-                              sep=sep,
-                              decimal=decimal,
-                              date_format=date_format)
-
-    y_train, y_test = pre.ts_split(df, test_size=points)
-    y_train = y_train.iloc[-num_datapoints:, :]
-    X_train = pre.create_sample_feat(y_train,
-                                     window_length=window_length,
-                                     features=features,
-                                     rolling_window=rolling_window)
-
-    X_train = X_train.loc[:, ~X_train.columns.duplicated()]
-
-    y_horizon = pre.create_horizon(y_train, horizon)
-    y_horizon = y_horizon.loc[X_train.index[0]:, :]
-
-    best_features = pre.feature_selection(X_train,
-                                          y_horizon.values.ravel(),
-                                          selected_feat)
-
-    X_train_selec = X_train.loc[:, best_features]
-
-    regressor_1 = prediction.KNN_Model
-    regressor_1.fit(X=X_train_selec,
-                    y=y_horizon.values.ravel())
-
-    pred_1 = prediction.rec_forecast(y=y_train,
-                                     model=regressor_1,
-                                     window_length=window_length,
-                                     feature_names=best_features,
-                                     rolling_window=rolling_window,
-                                     n_steps=points,
-                                     freq=freq)
-
-    error_1 = metrics.switch_abs_error('mse', y_test, pred_1)
-
-    regressor_2 = prediction.LGB_Model
-    regressor_2.fit(X=X_train_selec,
-                    y=y_horizon.values.ravel())
-
-    pred_2 = prediction.rec_forecast(y=y_train,
-                                     model=regressor_2,
-                                     window_length=window_length,
-                                     feature_names=best_features,
-                                     rolling_window=rolling_window,
-                                     n_steps=points,
-                                     freq=freq)
-
-    error_2 = metrics.switch_abs_error('mse', y_test, pred_2)
-
-    if error_1 < error_2:
-        print('Using KNN Prediction')
-        if opt:
-            print('Optimizing model')
-            regressor_1_o = prediction.KNN_Model_Opt(opt_runs=opt_runs)
-            regressor_1_o.fit(X=X_train_selec,
-                              y=y_horizon.values.ravel())
-            pred_1_o = prediction.rec_forecast(y=y_train,
-                                               model=regressor_1_o,
-                                               window_length=window_length,
-                                               feature_names=best_features,
-                                               rolling_window=rolling_window,
-                                               n_steps=points,
-                                               freq=freq)
-            pred = pred_1_o
-            reg = regressor_1_o
-        else:
-            pred = pred_1
-            reg = regressor_1
-    else:
-        print('Using LightGBM prediction')
-        if opt:
-            print('Optimizing model')
-            regressor_2_o = prediction.LGB_Model_Opt(opt_runs=opt_runs)
-            regressor_2_o.fit(X=X_train_selec,
-                              y=y_horizon.values.ravel())
-            pred_2_o = prediction.rec_forecast(y=y_train,
-                                               model=regressor_2_o,
-                                               window_length=window_length,
-                                               feature_names=best_features,
-                                               rolling_window=rolling_window,
-                                               n_steps=points,
-                                               freq=freq)
-            pred = pred_2_o
-            reg = regressor_2_o
-        else:
-            pred = pred_2
-            reg = regressor_2
-
-    if plot:
-        plotting.plot_test_pred(y_test, pred)
-
-    if plot_train:
-        plotting.plot_train(y_train)
-
-    if error:
-        abs_error = []
-        for i in error:
-            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
-        print(error)
-        print(abs_error)
-
-    if rel_metrics:
-        naive = naive_prediction(filename=filename, freq=freq,
-                                 targetcol=targetcol, datecol=datecol,
-                                 sep=sep, decimal=decimal,
-                                 date_format=date_format, points=points,
-                                 num_datapoints=num_datapoints)
-        r_error = metrics.relative_error(y_test, pred, naive['pred'])
-        print('error relative to naïve prediction')
-        print(r_error)
-
-    response = {'filename': filename,
-                'features': features,
-                'regressor': reg,
-                'r_error': r_error,
-                'abs_error': abs_error,
-                'error': error,
-                'pred': pred,
-                'y_test': y_test,
-                'naive': naive
-                }
-    return response
-
-
-def slow_prediction(filename, freq, targetcol, datecol,
-                    sep, decimal, date_format,
-                    points=50, window_length=100, rolling_window=[5, 10, 20],
-                    horizon=1, step=1,
-                    features=features,
-                    selected_feat=50, num_datapoints=2000,
-                    plot=True, error=['mse', 'mape'],
-                    rel_metrics=True, opt=False, opt_runs=30,
-                    plot_train=True):
-
-    if rel_metrics is not True:
-        r_error = None
-
-    df = data_input.read_data(filename=filename,
-                              freq=freq,
-                              targetcol=targetcol,
-                              datecol=datecol,
-                              sep=sep,
-                              decimal=decimal,
-                              date_format=date_format)
-
-    y_train, y_test = pre.ts_split(df, test_size=points)
-    y_train = y_train.iloc[-num_datapoints:, :]
-
-    X_train = pre.create_sample_feat(y_train,
-                                     window_length=window_length,
-                                     features=features,
-                                     rolling_window=rolling_window)
-
-    X_train = X_train.loc[:, ~X_train.columns.duplicated()]
-
-    y_horizon = pre.create_horizon(y_train, horizon)
-    y_horizon = y_horizon.loc[X_train.index[0]:, :]
-
-    best_features = pre.feature_selection(X_train,
-                                          y_horizon.values.ravel(),
-                                          selected_feat)
-
-    X_train_selec = X_train.loc[:, best_features]
-
-    regressor_1 = prediction.KNN_Model
-    regressor_1.fit(X=X_train_selec,
-                    y=y_horizon.values.ravel())
-
-    pred_1 = prediction.rec_forecast(y=y_train,
-                                     model=regressor_1,
-                                     window_length=window_length,
-                                     feature_names=best_features,
-                                     rolling_window=rolling_window,
-                                     n_steps=points,
-                                     freq=freq)
-
-    error_1 = metrics.switch_abs_error('mse', y_test, pred_1)
-
-    regressor_2 = prediction.LGB_Model
-    regressor_2.fit(X=X_train_selec,
-                    y=y_horizon.values.ravel())
-
-    pred_2 = prediction.rec_forecast(y=y_train,
-                                     model=regressor_2,
-                                     window_length=window_length,
-                                     feature_names=best_features,
-                                     rolling_window=rolling_window,
-                                     n_steps=points,
-                                     freq=freq)
-
-    error_2 = metrics.switch_abs_error('mse', y_test, pred_2)
-
-    regressor_3 = prediction.LSTM_Model(n_feat=selected_feat)
-    regressor_3.fit(x=X_train_selec.to_numpy().reshape(-1, 1, selected_feat),
-                    y=y_horizon.values.ravel())
-
-    pred_3 = prediction.rec_forecast_np(y=y_train,
-                                        model=regressor_3,
-                                        window_length=window_length,
-                                        feature_names=best_features,
-                                        rolling_window=rolling_window,
-                                        n_steps=points,
-                                        freq=freq)
-
-    error_3 = metrics.switch_abs_error('mse', y_test, pred_3)
-
-    if (error_3 < error_2) & (error_3 < error_1):
-        pred = pred_3
-        reg = regressor_3
-        print('Using LSTM prediction')
-    elif(error_2 < error_1) & (error_2 < error_3):
-        print('Using LightGBM prediction')
-        if opt:
-            print('Optimizing model')
-            regressor_2_o = prediction.LGB_Model_Opt(opt_runs=opt_runs)
-            regressor_2_o.fit(X=X_train_selec,
-                              y=y_horizon.values.ravel())
-            pred_2_o = prediction.rec_forecast(y=y_train,
-                                               model=regressor_2_o,
-                                               window_length=window_length,
-                                               feature_names=best_features,
-                                               rolling_window=rolling_window,
-                                               n_steps=points,
-                                               freq=freq)
-            pred = pred_2_o
-            reg = regressor_2_o
-        else:
-            pred = pred_2
-            reg = regressor_2
-    else:
-        print('Using KNN Prediction')
-        if opt:
-            print('Optimizing model')
-            regressor_1_o = prediction.KNN_Model_Opt(opt_runs=opt_runs)
-            regressor_1_o.fit(X=X_train_selec,
-                              y=y_horizon.values.ravel())
-            pred_1_o = prediction.rec_forecast(y=y_train,
-                                               model=regressor_1_o,
-                                               window_length=window_length,
-                                               feature_names=best_features,
-                                               rolling_window=rolling_window,
-                                               n_steps=points,
-                                               freq=freq)
-            pred = pred_1_o
-            reg = regressor_1_o
-        else:
-            pred = pred_1
-            reg = regressor_1
-
-    if plot:
-        plotting.plot_test_pred(y_test, pred)
-
-    if plot_train:
-        plotting.plot_train(y_train)
-
-    if error:
-        abs_error = []
-        for i in error:
-            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
-        print(error)
-        print(abs_error)
-
-    if rel_metrics:
-        naive = naive_prediction(filename=filename, freq=freq,
-                                 targetcol=targetcol, datecol=datecol,
-                                 sep=sep, decimal=decimal,
-                                 date_format=date_format, points=points,
-                                 num_datapoints=num_datapoints)
-        r_error = metrics.relative_error(y_test, pred, naive['pred'])
-        print('error relative to naïve prediction')
-        print(r_error)
-
-    response = {'filename': filename,
-                'features': features,
-                'regressor': reg,
-                'r_error': r_error,
-                'abs_error': abs_error,
-                'error': error,
-                'pred': pred,
-                'y_test': y_test,
-                'naive': naive
-                }
-    return response
-
-
-def naive_prediction(filename, freq, targetcol, datecol,
-                     sep, decimal, date_format,
-                     points=50, num_datapoints=2000, plot=False,
-                     error=['mse', 'mape']):
-
-    df = data_input.read_data(filename=filename,
-                              freq=freq,
-                              targetcol=targetcol,
-                              datecol=datecol,
-                              sep=sep,
-                              decimal=decimal,
-                              date_format=date_format)
-    df = df.squeeze()
-    y_train, y_test = pre.ts_split(df, test_size=points)
-    y_train = y_train.iloc[-num_datapoints:]
-
-    regressor = prediction.Naive_Model()
-
-    regressor.fit(y_train)
-
-    pred = regressor.predict(fh=np.arange(len(y_test)) + 1)
-
-    if plot:
-        plotting.plot_test_pred(y_test.to_frame(), pred)
-
-    if error:
-        abs_error = []
-        for i in error:
-            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
-        print('Naïve error metrics:')
-        print(error)
-        print(abs_error)
-        reg = regressor
-
-    response = {'filename': filename,
-                'features': None,
-                'regressor': reg,
-                'r_error': None,
-                'abs_error': abs_error,
-                'error': error,
-                'pred': pred,
-                'y_true': y_test
-                }
-    return response
-
-
 class Pipeline(object):
     def __init__(self, filename: str,
                  type: str = 'balanced', freq: str = "15T",
@@ -479,7 +29,7 @@ class Pipeline(object):
                  window_length: int = 100, horizon: int = 1,
                  rolling_window: "list[int]" = [5, 10, 20], points: int = 50,
                  error: "list[str]" = ['mse', 'mape'],
-                 num_datapoints: int = 2000, plot_train: bool = True,
+                 num_datapoints: int = 5000, plot_train: bool = True,
                  rel_metrics=True,
                  **kwargs):
 
@@ -584,10 +134,11 @@ class Pipeline(object):
                                               selected_feat)
 
         X_train_selec = self.X_train.loc[:, best_features]
-        self.X_train_selec = X_train_selec
+        self.scaler = pre.scaler.fit(X_train_selec)
+        self.X_train_selec = self.scaler.transform(X_train_selec)
         self.best_features = best_features
 
-    def fit(self):
+    def fit(self, type='balanced'):
         """
         Fits the ML model(s) according to the type parameter.
 
@@ -602,6 +153,7 @@ class Pipeline(object):
         This method doesn't accept parameters but rather inherits from the ones
         defined in __init__
         """
+        self.type = type
         self.modeltype = 'Pandas'
         regressor_1 = prediction.KNN_Model
         regressor_2 = prediction.LGB_Model
@@ -617,7 +169,8 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq)
+                                             freq=self.freq,
+                                             scaler=self.scaler)
 
             error_1 = metrics.switch_abs_error('mse', self.y_test, pred_1)
 
@@ -633,7 +186,8 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq)
+                                             freq=self.freq,
+                                             scaler=self.scaler)
 
             error_1 = metrics.switch_abs_error('mse', self.y_test, pred_1)
 
@@ -645,7 +199,8 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq)
+                                             freq=self.freq,
+                                             scaler=self.scaler)
             error_2 = metrics.switch_abs_error('mse', self.y_test, pred_2)
 
             if error_2 > error_1:
@@ -665,7 +220,8 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq)
+                                             freq=self.freq,
+                                             scaler=self.scaler)
 
             error_1 = metrics.switch_abs_error('mse', self.y_test, pred_1)
 
@@ -677,7 +233,8 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq)
+                                             freq=self.freq,
+                                             scaler=self.scaler)
             error_2 = metrics.switch_abs_error('mse', self.y_test, pred_2)
 
             regressor_3.fit(x=self.X_train_selec.to_numpy().reshape(-1, 1, self.selected_feat),
@@ -688,7 +245,8 @@ class Pipeline(object):
                                                 feature_names=self.best_features,
                                                 rolling_window=self.rolling_window,
                                                 n_steps=self.points,
-                                                freq=self.freq)
+                                                freq=self.freq,
+                                                scaler=self.scaler)
             error_3 = metrics.switch_abs_error('mse', self.y_test, pred_3)
 
             if (error_3 < error_2) & (error_3 < error_1):
@@ -777,7 +335,8 @@ class Pipeline(object):
                                          feature_names=self.best_features,
                                          rolling_window=self.rolling_window,
                                          n_steps=self.points,
-                                         freq=self.freq)
+                                         freq=self.freq,
+                                         scaler=self.scaler)
 
         error_1 = metrics.switch_abs_error('mse', self.y_test, pred_1)
 
@@ -791,7 +350,8 @@ class Pipeline(object):
                                          feature_names=self.best_features,
                                          rolling_window=self.rolling_window,
                                          n_steps=self.points,
-                                         freq=self.freq)
+                                         freq=self.freq,
+                                         scaler=self.scaler)
 
         error_2 = metrics.switch_abs_error('mse', self.y_test, pred_2)
 
@@ -808,7 +368,8 @@ class Pipeline(object):
                                                feature_names=self.best_features,
                                                rolling_window=self.rolling_window,
                                                n_steps=self.points,
-                                               freq=self.freq)
+                                               freq=self.freq,
+                                               scaler=self.scaler)
             pred = pred_1_o
             reg = regressor_1_o
         else:
@@ -824,7 +385,8 @@ class Pipeline(object):
                                                feature_names=self.best_features,
                                                rolling_window=self.rolling_window,
                                                n_steps=self.points,
-                                               freq=self.freq)
+                                               freq=self.freq,
+                                               scaler=self.scaler)
             pred = pred_2_o
             reg = regressor_2_o
 
@@ -897,7 +459,8 @@ class Pipeline(object):
                                                 feature_names=self.best_features,
                                                 rolling_window=self.rolling_window,
                                                 n_steps=num_points,
-                                                freq=self.freq)
+                                                freq=self.freq,
+                                                scaler=self.scaler)
         else:
             pred_r = prediction.rec_forecast(y=self.df,
                                              model=self.model,
@@ -905,7 +468,54 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=num_points,
-                                             freq=self.freq)
+                                             freq=self.freq,
+                                             scaler=self.scaler)
 
         self.pred_r = pred_r
         return pred_r
+
+
+def naive_prediction(filename, freq, targetcol, datecol,
+                     sep, decimal, date_format,
+                     points=50, num_datapoints=5000, plot=False,
+                     error=['mse', 'mape']):
+
+    df = data_input.read_data(filename=filename,
+                              freq=freq,
+                              targetcol=targetcol,
+                              datecol=datecol,
+                              sep=sep,
+                              decimal=decimal,
+                              date_format=date_format)
+    df = df.squeeze()
+    y_train, y_test = pre.ts_split(df, test_size=points)
+    y_train = y_train.iloc[-num_datapoints:]
+
+    regressor = prediction.Naive_Model()
+
+    regressor.fit(y_train)
+
+    pred = regressor.predict(fh=np.arange(len(y_test)) + 1)
+
+    if plot:
+        plotting.plot_test_pred(y_test.to_frame(), pred)
+
+    if error:
+        abs_error = []
+        for i in error:
+            abs_error.append(metrics.switch_abs_error(i, y_test, pred))
+        print('Naïve error metrics:')
+        print(error)
+        print(abs_error)
+        reg = regressor
+
+    response = {'filename': filename,
+                'features': None,
+                'regressor': reg,
+                'r_error': None,
+                'abs_error': abs_error,
+                'error': error,
+                'pred': pred,
+                'y_true': y_test
+                }
+    return response
