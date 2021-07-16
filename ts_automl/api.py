@@ -140,19 +140,19 @@ async def upload_csv(file: UploadFile = File(...),
 
 
 @app.get('/Fit/')
-async def model_fitting():
+async def model_fitting(opt: Optional[bool] = Query(False),
+                        opt_runs: Optional[int] = 50):
 
     if path == '':
         response = 'No training data uploaded.'
     else:
-        if model.opt:
-            model_fit = model.fit_opt()
-            response = model_fit
+        if opt:
+            model_fit = model.fit_opt(opt_runs)
+            response = "Fit successful"
         else:
             model_fit = model.fit()
-            response = model_fit
-
-    return{response}
+            response = "Fit successful"
+    return response
 
 
 @app.get('/Predict/')
@@ -161,8 +161,8 @@ async def model_predict(horizon: int = Query(50)):
         response = 'Use /Fit/ method first'
     elif model.abs_error is not None:
         prediction = model.predict(num_points=horizon)
-        response = prediction
-    return(response)
+        response = dict(enumerate(prediction.flatten(), 1)) 
+    return (response)
 
 
 def run_api(port=2021, log_level='debug'):
