@@ -29,7 +29,7 @@ class Pipeline(object):
                  window_length: int = 100, horizon: int = 1,
                  rolling_window: "list[int]" = [5, 10, 20], points: int = 50,
                  error: "list[str]" = ['mse', 'mape'],
-                 num_datapoints: int = 5000, plot_train: bool = True,
+                 num_datapoints: int = 2000, plot_train: bool = True,
                  rel_metrics=True,
                  **kwargs):
 
@@ -133,9 +133,9 @@ class Pipeline(object):
                                               self.y_horizon.values.ravel(),
                                               selected_feat)
 
-        X_train_selec = self.X_train.loc[:, best_features]
-        self.scaler = pre.scaler.fit(X_train_selec)
-        self.X_train_selec = self.scaler.transform(X_train_selec)
+        self.X_train_selec = self.X_train.loc[:, best_features]
+        # self.scaler = pre.scaler
+        # self.X_train_selec = self.scaler.fit_transform(X_train_selec)
         self.best_features = best_features
 
     def fit(self):
@@ -169,8 +169,7 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq,
-                                             scaler=self.scaler)
+                                             freq=self.freq)
 
             error_1 = metrics.switch_abs_error('mse', self.y_test, pred_1)
 
@@ -186,8 +185,7 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq,
-                                             scaler=self.scaler)
+                                             freq=self.freq)
 
             error_1 = metrics.switch_abs_error('mse', self.y_test, pred_1)
 
@@ -199,8 +197,7 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq,
-                                             scaler=self.scaler)
+                                             freq=self.freq)
             error_2 = metrics.switch_abs_error('mse', self.y_test, pred_2)
 
             if error_2 > error_1:
@@ -220,8 +217,7 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq,
-                                             scaler=self.scaler)
+                                             freq=self.freq)
 
             error_1 = metrics.switch_abs_error('mse', self.y_test, pred_1)
 
@@ -233,20 +229,18 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=self.points,
-                                             freq=self.freq,
-                                             scaler=self.scaler)
+                                             freq=self.freq)
             error_2 = metrics.switch_abs_error('mse', self.y_test, pred_2)
 
             regressor_3.fit(x=self.X_train_selec.to_numpy().reshape(-1, 1, self.selected_feat),
                             y=self.y_horizon.values.ravel())
             pred_3 = prediction.rec_forecast_np(y=self.y_train,
-                                                model=self.regressor_3,
+                                                model=regressor_3,
                                                 window_length=self.window_length,
                                                 feature_names=self.best_features,
                                                 rolling_window=self.rolling_window,
                                                 n_steps=self.points,
-                                                freq=self.freq,
-                                                scaler=self.scaler)
+                                                freq=self.freq)
             error_3 = metrics.switch_abs_error('mse', self.y_test, pred_3)
 
             if (error_3 < error_2) & (error_3 < error_1):
@@ -305,7 +299,7 @@ class Pipeline(object):
 
         return response
 
-    def fit_opt(self, opt_runs):
+    def fit_opt(self, opt_runs=50):
         """
         Fits the ML model(s) with optimization
 
@@ -335,8 +329,7 @@ class Pipeline(object):
                                          feature_names=self.best_features,
                                          rolling_window=self.rolling_window,
                                          n_steps=self.points,
-                                         freq=self.freq,
-                                         scaler=self.scaler)
+                                         freq=self.freq)
 
         error_1 = metrics.switch_abs_error('mse', self.y_test, pred_1)
 
@@ -350,8 +343,7 @@ class Pipeline(object):
                                          feature_names=self.best_features,
                                          rolling_window=self.rolling_window,
                                          n_steps=self.points,
-                                         freq=self.freq,
-                                         scaler=self.scaler)
+                                         freq=self.freq)
 
         error_2 = metrics.switch_abs_error('mse', self.y_test, pred_2)
 
@@ -368,8 +360,7 @@ class Pipeline(object):
                                                feature_names=self.best_features,
                                                rolling_window=self.rolling_window,
                                                n_steps=self.points,
-                                               freq=self.freq,
-                                               scaler=self.scaler)
+                                               freq=self.freq)
             pred = pred_1_o
             reg = regressor_1_o
         else:
@@ -385,8 +376,7 @@ class Pipeline(object):
                                                feature_names=self.best_features,
                                                rolling_window=self.rolling_window,
                                                n_steps=self.points,
-                                               freq=self.freq,
-                                               scaler=self.scaler)
+                                               freq=self.freq)
             pred = pred_2_o
             reg = regressor_2_o
 
@@ -459,8 +449,7 @@ class Pipeline(object):
                                                 feature_names=self.best_features,
                                                 rolling_window=self.rolling_window,
                                                 n_steps=num_points,
-                                                freq=self.freq,
-                                                scaler=self.scaler)
+                                                freq=self.freq)
         else:
             pred_r = prediction.rec_forecast(y=self.df,
                                              model=self.model,
@@ -468,8 +457,7 @@ class Pipeline(object):
                                              feature_names=self.best_features,
                                              rolling_window=self.rolling_window,
                                              n_steps=num_points,
-                                             freq=self.freq,
-                                             scaler=self.scaler)
+                                             freq=self.freq)
 
         self.pred_r = pred_r
         return pred_r
@@ -491,7 +479,7 @@ def naive_prediction(filename, freq, targetcol, datecol,
     y_train, y_test = pre.ts_split(df, test_size=points)
     y_train = y_train.iloc[-num_datapoints:]
 
-    regressor = prediction.Naive_Model()
+    regressor = prediction.NaiveForecaster(strategy= "mean", window_length=100)
 
     regressor.fit(y_train)
 

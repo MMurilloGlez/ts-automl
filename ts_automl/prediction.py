@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import datetime
 
-from sklearn.preprocessing import MinMaxScaler
+
 
 from sktime.forecasting.naive import NaiveForecaster
 
@@ -21,6 +21,8 @@ from keras.layers import Dense, LSTM
 from tensorflow.keras.metrics import MeanAbsolutePercentageError
 from keras.wrappers.scikit_learn import KerasRegressor
 
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.neighbors import KNeighborsRegressor
 from lightgbm.sklearn import LGBMRegressor
 
@@ -85,9 +87,9 @@ knn_reg_params = {
     'leaf_size': hp.choice('leaf_size', np.arange(30, 60, 10))
     }
 
-Naive_Model = NaiveForecaster
-KNN_Model = KNeighborsRegressor(n_jobs=-1)
-LGB_Model = LGBMRegressor(n_jobs=-1)
+Naive_Model = NaiveForecaster()
+KNN_Model = make_pipeline(StandardScaler(), KNeighborsRegressor(n_jobs=-1))
+LGB_Model = make_pipeline(StandardScaler(), LGBMRegressor(n_jobs=-1))
 
 
 def KNN_Model_Opt(opt_runs=50, knn_reg_params=knn_reg_params):
@@ -104,8 +106,6 @@ def LGB_Model_Opt(opt_runs=50, lgb_reg_params=lgb_reg_params):
               max_evals=opt_runs,
               n_jobs=-1))
 
-
-scaler = MinMaxScaler(feature_range=(0, 1))
 
 
 def switch_features(value, lags_data, date, rolling_window, num):
@@ -484,16 +484,13 @@ def create_features(feature_names, lags_data, date):
 
 
 def rec_forecast(y, model, window_length, feature_names, rolling_window,
-                 n_steps, freq, scaler):
+                 n_steps, freq):
     """
     Forecasting function which applies a given model recursively in a series
-
     Function, taking as an input the lagged time series with created features
     (Feature selection preprocessing optional) and applies recursive
     forecasting using a pre-trained model. Next time step is predicted with
     respect to the last prediction made.
-
-
     Parameters
     ----------
     y: pd.Series
@@ -505,80 +502,56 @@ def rec_forecast(y, model, window_length, feature_names, rolling_window,
         number of time periods in the forecasting horizon
     step: int
         forecasting time period
-
     Returns
     -------
     fcast_values: pd.Series with forecasted values
     """
-
     last_date = y.index[-1] + datetime.timedelta(minutes=15)
     target_range = pd.date_range(last_date, periods=n_steps, freq=freq)
     target_value = np.arange(n_steps, dtype=float)
     max_rol = max(rolling_window, default=1)
     lags = list(y.iloc[-(window_length+(max_rol-1)):, 0].values)
-
     for i in range(n_steps):
-        train = create_features(feature_names, lags,
-                                target_range[i])
-        train = scaler.transform(np.asarray(train).reshape(1, -1))
-        new_value = model.predict(pd.DataFrame(train))
+        train = create_features(feature_names, lags, target_range[i])
+        new_value = model.predict(pd.DataFrame(train).transpose())
         target_value[i] = new_value[0]
         lags.pop(0)
         lags.append(new_value[0])
-
     return target_value
 
 
 def rec_forecast_np(y, model, window_length, feature_names,
-                    rolling_window, n_steps, freq, scaler):
+                    rolling_window, n_steps, freq):
     """
     Recursive forecast function using numpy arrays
-
     Since keras LSTM and TCN models require numpy arrays that have specific
     shapes to function, implement recursive forecasting on numpy arrays,
     updating each data point with the previous one to predict the next.
-
     Parameters
     ----------
     y: pd.Series
         Input time series with constant frequency
     model: pre-trained model
         Keras RNN model
-    scaler: Scaler
-        Scaler to apply to Keras model input
-
+        
     Returns
     -------
     pd.Series
         Forecasted values
     """
-
     last_date = y.index[-1] + datetime.timedelta(minutes=15)
     target_range = pd.date_range(last_date, periods=n_steps, freq=freq)
     target_value = np.arange(n_steps, dtype='float32')
     max_rol = max(rolling_window, default=1)
     lags = list(y.iloc[-(window_length+(max_rol-1)):, 0].values)
-
     for i in range(n_steps):
-        train = create_features(feature_names, lags,
-                                target_range[i])
+        train = create_features(feature_names, lags, target_range[i])
         train_np = np.array(train, dtype='float32')
-        train_np_s = scaler.transform((train_np.reshape(1, -1)))
+        train_np_s = train_np.reshape(-1, 1)
         new_value = model.predict(train_np_s.reshape(-1, 1,
                                   len(feature_names)))
         new_valu_0 = new_value
         target_value[i] = new_valu_0
         lags.pop(0)
         lags.append(new_valu_0)
-
     return target_value
-
-
-def scale(y, scaler=scaler):
-    y_scale = scaler.fit_transform(y)
-    return(y_scale)
-
-
-def unscale(y, scaler=scaler):
-    y_orig = scaler.inverse_transform(y)
-    return(y_orig)
