@@ -138,7 +138,7 @@ class Pipeline(object):
         self.X_train_selec = self.scaler.transform(X_train_selec)
         self.best_features = best_features
 
-    def fit(self, type='balanced'):
+    def fit(self):
         """
         Fits the ML model(s) according to the type parameter.
 
@@ -153,7 +153,7 @@ class Pipeline(object):
         This method doesn't accept parameters but rather inherits from the ones
         defined in __init__
         """
-        self.type = type
+
         self.modeltype = 'Pandas'
         regressor_1 = prediction.KNN_Model
         regressor_2 = prediction.LGB_Model
@@ -177,7 +177,7 @@ class Pipeline(object):
             pred = pred_1
             reg = regressor_1
 
-        if self.type == 'balanced':
+        elif self.type == 'balanced':
             regressor_1.fit(X=self.X_train_selec,
                             y=self.y_horizon.values.ravel())
             pred_1 = prediction.rec_forecast(y=self.y_train,
@@ -211,7 +211,7 @@ class Pipeline(object):
                 reg = regressor_2
                 pred = pred_2
 
-        if self.type == 'slow':
+        elif self.type == 'slow':
             regressor_1.fit(X=self.X_train_selec,
                             y=self.y_horizon.values.ravel())
             pred_1 = prediction.rec_forecast(y=self.y_train,
