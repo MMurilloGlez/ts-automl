@@ -205,7 +205,7 @@ def test_bal_2():
     model_2 = Pipeline(filename='./tests/test_series/Serie2.csv',
                        type='balanced',
                        freq='1T')
-    model_2.fit())
+    model_2.fit()
 
     assert model_2.r_error < 100
 
